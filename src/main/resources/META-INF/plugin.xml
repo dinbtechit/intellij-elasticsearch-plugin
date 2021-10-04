@@ -1,5 +1,5 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin  url="https://github.com/dinbtechit/intellij-elasticsearch-plugin">
+<idea-plugin url="https://github.com/dinbtechit/intellij-elasticsearch-plugin">
     <id>com.github.dinbtechit.intellijelasticsearchplugin</id>
     <name>Elasticsearch</name>
     <vendor>dinbtechit</vendor>
@@ -7,17 +7,51 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyProjectService"/>
-        <toolWindow factoryClass="com.github.dinbtechit.intellijelasticsearchplugin.ui.toolwindow.ElasticsearchFactory"
-                    icon="/images/elasticsearch-icon-13px.svg"
-                    anchor="right"
-                    secondary="true"
-                    order="last"
-                    id="Elasticsearch">
+        <applicationService
+                serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyApplicationService"/>
+        <projectService
+                serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyProjectService"/>
+        <toolWindow
+                factoryClass="com.github.dinbtechit.intellijelasticsearchplugin.ui.toolwindow.ElasticsearchToolWindow"
+                icon="ElasticsearchIcons.logo"
+                anchor="right"
+                secondary="true"
+                order="last"
+                id="Elasticsearch">
 
         </toolWindow>
     </extensions>
+
+    <actions>
+        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction"
+                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction"
+                icon="AllIcons.General.Add"
+                text="Elasticsearch: New Connection">
+            <override-text place="ToolwindowContent" text="New Connection"/>
+        </action>
+
+        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction"
+                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction"
+                icon="AllIcons.Actions.Copy"
+                text="Elasticsearch: Duplicate">
+            <override-text place="ToolwindowContent" text="Duplicate"/>
+        </action>
+
+        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction"
+                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction"
+                icon="AllIcons.Actions.Refresh"
+                text="Elasticsearch: Refresh">
+            <override-text place="ToolwindowTitle" text="Refresh"/>
+        </action>
+
+        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction"
+                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction"
+                icon="AllIcons.General.Settings"
+                text="Elasticsearch: View Properties">
+            <override-text place="ToolwindowContent" text="View Properties"/>
+        </action>
+
+    </actions>
 
     <applicationListeners>
         <listener class="com.github.dinbtechit.intellijelasticsearchplugin.listeners.MyProjectManagerListener"
