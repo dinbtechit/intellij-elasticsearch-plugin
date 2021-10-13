@@ -9,6 +9,6 @@ class ViewPropertiesAction: AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        TODO("Not Implemented")
+        println("View Properties Clicked")
     }
 }

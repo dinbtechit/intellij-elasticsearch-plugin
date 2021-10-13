@@ -10,6 +10,6 @@ class RefreshAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        TODO("Not Implemented")
+        println("Refresh Clicked")
     }
 }

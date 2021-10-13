@@ -9,6 +9,6 @@ class DuplicateAction: AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        TODO("Not Implemented")
+        println("duplicate Clicked")
     }
 }

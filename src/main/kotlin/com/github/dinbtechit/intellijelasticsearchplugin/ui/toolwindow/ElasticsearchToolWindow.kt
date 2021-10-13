@@ -4,6 +4,7 @@ import com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction
+import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
@@ -40,9 +41,13 @@ class ToolWindowContents(
     init {
         val content = ContentFactory.SERVICE.getInstance().createContent(this, "", false)
         toolWindow.contentManager.addContent(content)
-        toolbar = ActionManager.getInstance()
-            .createActionToolbar(ActionPlaces.CONTEXT_TOOLBAR, buildToolBar(), true).component
+        // Create Toolbar
+        val actionToolbar = ActionManager.getInstance()
+            .createActionToolbar(ActionPlaces.TOOLBAR, buildToolBar(), true)
+        actionToolbar.setTargetComponent(toolbar)
+        toolbar = actionToolbar.component
         setContent(getContentPanel())
+
     }
 
     private fun buildToolBar(): DefaultActionGroup {
@@ -85,7 +90,7 @@ class ToolWindowContents(
             row = 1
             fill = GridConstraints.FILL_BOTH
         })
-         return panel
+        return panel
     }
 
     private fun initToolbar(toolbar: JPanel) {

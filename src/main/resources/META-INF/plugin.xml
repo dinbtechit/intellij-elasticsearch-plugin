@@ -10,6 +10,8 @@
         <applicationService
                 serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyApplicationService"/>
         <projectService
+                serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig"/>
+        <projectService
                 serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyProjectService"/>
         <toolWindow
                 factoryClass="com.github.dinbtechit.intellijelasticsearchplugin.ui.toolwindow.ElasticsearchToolWindow"
