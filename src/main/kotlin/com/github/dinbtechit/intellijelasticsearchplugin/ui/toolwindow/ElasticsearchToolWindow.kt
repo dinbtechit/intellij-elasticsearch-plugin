@@ -43,8 +43,8 @@ class ToolWindowContents(
         toolWindow.contentManager.addContent(content)
         // Create Toolbar
         val actionToolbar = ActionManager.getInstance()
-            .createActionToolbar(ActionPlaces.TOOLBAR, buildToolBar(), true)
-        actionToolbar.setTargetComponent(toolbar)
+            .createActionToolbar("Elasticsearch", buildToolBar(), true)
+        actionToolbar.setTargetComponent(this)
         toolbar = actionToolbar.component
         setContent(getContentPanel())
 
@@ -108,7 +108,7 @@ class ToolWindowContents(
         }
 
         val actionToolbar = manager.createActionToolbar(ActionPlaces.TOOLWINDOW_TITLE, toolbarActionGroup, true)
-        actionToolbar.setTargetComponent(toolbar)
+        actionToolbar.setTargetComponent(this)
         toolbar.add(actionToolbar.component)
     }
 
