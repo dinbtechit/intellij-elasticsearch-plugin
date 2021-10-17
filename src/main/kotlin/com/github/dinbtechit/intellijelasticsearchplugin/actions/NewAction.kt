@@ -1,8 +1,8 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.actions
 
-import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
-import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.AddNewInstanceDialogWrapper
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.newdialog.leftcontent.LeftMenuPanel
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.newdialog.rightcontent.RightContentPanel
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 
