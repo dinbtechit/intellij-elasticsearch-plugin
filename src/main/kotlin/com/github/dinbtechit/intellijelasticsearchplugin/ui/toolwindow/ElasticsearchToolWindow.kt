@@ -47,7 +47,6 @@ class ToolWindowContents(
         actionToolbar.setTargetComponent(this)
         toolbar = actionToolbar.component
         setContent(getContentPanel())
-
     }
 
     private fun buildToolBar(): DefaultActionGroup {

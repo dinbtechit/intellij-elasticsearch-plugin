@@ -1,6 +1,6 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.models
 
-open class ElasticsearchDocument(open val name:String) {
+sealed class ElasticsearchDocument(open val name:String) {
     enum class Types(val value: String) {
         ALIAS("Aliases"),
         INDICES("Indices"),

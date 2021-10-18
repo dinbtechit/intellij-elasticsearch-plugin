@@ -1,17 +1,16 @@
-package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.newdialog.rightcontent
+package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightcontent
 
+import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.uiDesigner.core.Spacer
 import com.intellij.util.ui.UIUtil
 import java.awt.*
-import javax.swing.Box
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JTextField
+import javax.swing.*
 
 
-class ConfigurationTabPanel : JPanel() {
+class ConfigurationTabPanel(model: PropertyChangeModel) : JPanel() {
 
     // Fields
     private val hostLabel = JLabel()
@@ -34,8 +33,17 @@ class ConfigurationTabPanel : JPanel() {
 
 
     init {
+        name = "ConfigurationTabPanel"
         layout = BorderLayout(0, 0)
         initUIComponents()
+        model.addPropertyChangeListener {
+            if (it.newValue is ConnectionInfo) {
+                val newValue = it.newValue as ConnectionInfo
+                this.hostTextField.text = newValue.hostname
+                this.portTextField.text = newValue.port.toString()
+                this.urlTextField.text = newValue.url
+            }
+        }
     }
 
     private fun initUIComponents() {
@@ -43,122 +51,82 @@ class ConfigurationTabPanel : JPanel() {
             // Settings
             layout = GridBagLayout()
             preferredSize = Dimension(500, 300)
+            border = BorderFactory.createEmptyBorder(10, 5, 8, 0)
             gridBagConstraints.insets = Insets(2, 2, 2, 2)
 
-            add(Spacer())
+            add(Spacer().apply { preferredSize = Dimension(50, 50) })
 
             // Components
             // Host
             add(hostLabel.apply {
                 text = "Host:"
                 preferredSize = Dimension(50, 30)
-            }, gridBagConstraints.apply {
-                gridx = 0
-                gridy = 0
-                gridwidth = 1
-                weightx = 0.5
-                weighty = 0.0
-                anchor = GridBagConstraints.FIRST_LINE_START
-            })
+            }, createGbc(0, 0))
             add(Box.createHorizontalStrut(300))
             add(hostTextField.apply {
                 minimumSize = Dimension(300, 30)
                 preferredSize = Dimension(300, 30)
-            }, gridBagConstraints.apply {
-                gridx = 1
-                gridy = 0
-                anchor = GridBagConstraints.LINE_START
+            }, createGbc(1, 0).apply {
+                fill = GridBagConstraints.HORIZONTAL
             })
 
             // Port
             add(portLabel.apply {
                 text = "Port: "
                 preferredSize = Dimension(50, 30)
-            }, gridBagConstraints.apply {
-                gridx = 2
-                gridy = 0
-            })
+            }, createGbc(2, 0))
             add(portTextField.apply {
                 minimumSize = Dimension(100, 30)
                 preferredSize = Dimension(100, 30)
-            }, gridBagConstraints.apply {
-                gridx = 3
-                gridy = 0
-            })
+            }, createGbc(3, 0))
 
             // Authentication
             add(authenticationLabel.apply {
                 text = "Authentication: "
                 preferredSize = Dimension(110, 30)
-            }, gridBagConstraints.apply {
-                gridx = 0
-                gridy = 1
-            })
+            }, createGbc(0, 1))
             add(authTypeComboBox.apply {
                 minimumSize = Dimension(150, 30)
                 preferredSize = Dimension(150, 30)
-            }, gridBagConstraints.apply {
-                gridx = 1
-                gridy = 1
+            }, createGbc(1, 1).apply {
+                fill = GridBagConstraints.NONE
             })
 
             // User
             add(userLabel.apply {
                 text = "User: "
                 preferredSize = Dimension(50, 30)
-            }, gridBagConstraints.apply {
-                gridx = 0
-                gridy = 2
-            })
+            }, createGbc(0, 2))
             add(userTextField.apply {
                 minimumSize = Dimension(300, 30)
                 preferredSize = Dimension(300, 30)
-            }, gridBagConstraints.apply {
-                gridx = 1
-                gridy = 2
-            })
+            }, createGbc(1, 2))
 
             // password
             add(passwordLabel.apply {
                 text = "Password: "
                 preferredSize = Dimension(80, 30)
-            }, gridBagConstraints.apply {
-                gridx = 0
-                gridy = 3
-            })
+            }, createGbc(0, 3))
             add(passwordField.apply {
                 minimumSize = Dimension(300, 30)
                 preferredSize = Dimension(300, 30)
-            }, gridBagConstraints.apply {
-                gridx = 1
-                gridy = 3
-            })
+            }, createGbc(1, 3))
 
             // url
             add(urlLabel.apply {
                 text = "Url: "
                 preferredSize = Dimension(50, 30)
-            }, gridBagConstraints.apply {
-                gridx = 0
-                gridy = 4
-            })
+            }, createGbc(0, 4))
             add(urlTextField.apply {
                 minimumSize = Dimension(300, 30)
                 preferredSize = Dimension(300, 30)
-            }, gridBagConstraints.apply {
-                gridx = 1
-                gridy = 4
-            })
+            }, createGbc(1, 4))
 
             add(urlHelpTextLabel.apply {
                 text = "Overrides settings above"
                 preferredSize = Dimension(300, 30)
                 font = UIUtil.getFont(UIUtil.FontSize.SMALL, super.getFont())
-            }, gridBagConstraints.apply {
-                gridx = 1
-                gridy = 5
-                gridheight = 10
-                weighty = 1.0
+            }, createGbc(1, 5, true).apply {
                 anchor = GridBagConstraints.FIRST_LINE_START
             })
 
@@ -166,19 +134,19 @@ class ConfigurationTabPanel : JPanel() {
         add(contentPanel, BorderLayout.CENTER)
     }
 
-    private fun createGbc(x: Int, y: Int): GridBagConstraints {
+    private fun createGbc(x: Int, y: Int, isLastElement: Boolean = false): GridBagConstraints {
         val WEST_INSETS = Insets(5, 0, 5, 5)
         val EAST_INSETS = Insets(5, 5, 5, 0)
         return GridBagConstraints().apply {
             gridx = x
             gridy = y
             gridwidth = 1
-            gridheight = 1
-            anchor = if (x == 0) GridBagConstraints.WEST else GridBagConstraints.EAST
-            fill = if (x == 0) GridBagConstraints.BOTH else GridBagConstraints.HORIZONTAL
-            insets = if (x == 0) WEST_INSETS else EAST_INSETS
-            weightx = if (x == 0) 0.1 else 1.0
-            weighty = 1.0
+            gridheight = if (isLastElement) 10 else 1
+            anchor = if (x == 0) GridBagConstraints.WEST else GridBagConstraints.LINE_START
+            fill = if (x == 0) GridBagConstraints.BOTH else GridBagConstraints.REMAINDER
+            insets = WEST_INSETS
+            weightx = if (x == 0 || x == 2) 0.1 else 1.0
+            weighty = if (isLastElement) 1.0 else 0.0
         }
     }
 

@@ -1,9 +1,6 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.services.state
 
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
-import com.intellij.openapi.components.service
+import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Attribute
@@ -11,14 +8,19 @@ import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
 import java.util.*
 
-@State(name = "org.github.dinbtechit.ElasticSearchConfig", storages = [Storage("elasticsearch.config.xml")])
+@State(name = "org.github.dinbtechit.ElasticSearchConfig",
+    storages = [Storage("elasticsearch.config.xml")])
 class ElasticSearchConfig : PersistentStateComponent<ElasticSearchConfig> {
 
     @XCollection(propertyElementName = "connections")
     var connections = mutableListOf<ConnectionInfo>()
 
-    fun getInstance(project: Project): ElasticSearchConfig = project.service()
-
+    companion object {
+        @JvmStatic
+        fun getInstance(project: Project): ElasticSearchConfig {
+           return project.service()
+        }
+    }
     override fun getState(): ElasticSearchConfig = this
 
     override fun loadState(state: ElasticSearchConfig) = XmlSerializerUtil.copyBean(state, this)

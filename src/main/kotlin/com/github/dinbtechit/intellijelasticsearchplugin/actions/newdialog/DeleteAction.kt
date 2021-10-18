@@ -1,6 +1,5 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog
 
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.AddNewInstanceDialogWrapper
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 

@@ -4,10 +4,11 @@ import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.Project
 
-object ProjectUtils {
-    val currentProject: Project = let {
+class ProjectUtils {
+
+    fun currentProject(): Project {
         val dataContext = DataManager.getInstance().dataContextFromFocusAsync.blockingGet(2000)
-        dataContext?.getData(CommonDataKeys.PROJECT) as Project
+        return dataContext?.getData(CommonDataKeys.PROJECT) as Project
     }
 }
 

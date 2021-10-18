@@ -1,13 +1,14 @@
-package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.newdialog.rightcontent
+package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightcontent
 
+import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.ui.components.panels.NonOpaquePanel
-import com.intellij.uiDesigner.core.Spacer
 import java.awt.*
 import javax.swing.*
+import javax.swing.border.MatteBorder
 
-class RightContentPanel : NonOpaquePanel() {
+class RightContentPanel(private val modelListener: PropertyChangeModel) : JPanel() {
 
     // Fields
     private val nameTextField: JTextField = JTextField()
@@ -16,6 +17,7 @@ class RightContentPanel : NonOpaquePanel() {
     // Containers
     private val topPanel = JPanel()
     private val tabbedPanel = JBTabbedPane()
+    private val bottomPanel = JPanel()
 
     // Style/Constrains
     private val gridBagConstraints =  GridBagConstraints()
@@ -23,6 +25,12 @@ class RightContentPanel : NonOpaquePanel() {
     init {
         layout = BorderLayout(0, 0)
         initUIComponents()
+        modelListener.addPropertyChangeListener {
+            if (it.newValue is ConnectionInfo) {
+                val newValue = it.newValue as ConnectionInfo
+                nameTextField.text = newValue.name
+            }
+        }
     }
 
     private fun initUIComponents() {
@@ -30,36 +38,36 @@ class RightContentPanel : NonOpaquePanel() {
         /* Start of Top panel*/
         // Top Panel
         topPanel.apply {
-            border = BorderFactory.createEmptyBorder(8, 12, 8, 12)
-            preferredSize = Dimension(500, 50)
+            border = BorderFactory.createEmptyBorder(8, 10, 15, 12)
+            preferredSize = Dimension(500, 70)
             layout = GridBagLayout()
-
-            add(Spacer())
+            gridBagConstraints.insets = Insets(2, 2, 0, 10)
 
             // NameLabel
             add(nameLabel.apply {
                 text = "Name:"
                 horizontalTextPosition = SwingConstants.LEFT
-                preferredSize = Dimension(50, 18)
+                preferredSize = Dimension(50, 30)
             }, gridBagConstraints.apply {
                 gridx = 0
                 gridy = 0
-                weightx = 0.5
+                gridwidth = 1
+                weightx = 0.0
                 weighty = 0.5
                 anchor = GridBagConstraints.LINE_START
-                insets = Insets(0, 0, 0, 5)
+                fill = GridBagConstraints.BOTH
             })
 
             // NameTextField
             add(nameTextField.apply {
-                minimumSize = Dimension(350, 30)
-                preferredSize = Dimension(350, 30)
+                minimumSize = Dimension(400, 30)
+                preferredSize = Dimension(400, 30)
             }, gridBagConstraints.apply {
                 gridx = 1
                 gridy = 0
-                gridwidth = 3
-                weightx = 3.0
-                insets = Insets(0, 0, 0, 0)
+                gridwidth = 1
+                weightx = 1.0
+                fill = GridBagConstraints.NONE
             })
         }
 
@@ -68,11 +76,10 @@ class RightContentPanel : NonOpaquePanel() {
 
         // Start of Tabbed Panel
         tabbedPanel.apply {
-            // Style
-
             // Content Starts
             // 1. Configuration Tab
-            add("Configuration", JBScrollPane(ConfigurationTabPanel()).apply {
+            name = "tabbedPanel"
+            add("Configuration", JBScrollPane(ConfigurationTabPanel(modelListener)).apply {
                 border = BorderFactory.createEmptyBorder()
                 verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
                 horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
@@ -87,5 +94,12 @@ class RightContentPanel : NonOpaquePanel() {
         }
         add(tabbedPanel, BorderLayout.CENTER)
         // End of Tabbed Panel
+
+        bottomPanel.apply{
+            preferredSize = Dimension( Int.MAX_VALUE, 50)
+            isVisible = tabbedPanel.selectedIndex == 0
+            border = MatteBorder(1, 0, 1, 0, Color.decode("#2F3233"))
+        }
+        add(bottomPanel, BorderLayout.SOUTH)
     }
 }
