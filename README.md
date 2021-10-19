@@ -3,6 +3,12 @@
 ![Build](https://github.com/dinbtechit/intellij-elasticsearch-plugin/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+![](https://img.shields.io/badge/Plugin-UNDER--CONSTRUCTION-yellow)
+
+**Sneak Preview:**
+
+![](doc/preview.gif) ![](doc/plugin.png)
+
 
 ## Template ToDo list
 - [x] Create a new [IntelliJ Platform Plugin Template][template] project.
