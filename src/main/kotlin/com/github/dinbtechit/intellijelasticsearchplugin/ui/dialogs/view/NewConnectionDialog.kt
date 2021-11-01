@@ -8,16 +8,15 @@ import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightco
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.OnePixelSplitter
-import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.layout.panel
-import com.intellij.util.ui.JBUI
-import com.intellij.util.ui.UIUtil
-import com.jetbrains.rd.framework.base.deepClonePolymorphic
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Dimension
+import java.awt.GridBagLayout
 import javax.swing.JComponent
-import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.SwingConstants
 import javax.swing.border.Border
 import javax.swing.border.MatteBorder
 
@@ -28,10 +27,15 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
     private val controller = NewDialogController(model)
     private val oneSplitter = OnePixelSplitter(false, .3f)
 
+    // Components
+    private val emptyPanel = EmptyPanel()
+    private val leftMenuPanel = LeftMenuPanel(controller, model)
+    private val rightPanel = RightContentPanel(model)
+
     init {
         title = "New Elasticsearch Connections"
         init()
-       // subscribeToListeners()
+        subscribeToListeners()
     }
 
     override fun createContentPaneBorder(): Border {
@@ -53,9 +57,8 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
     override fun createCenterPanel(): JComponent {
         oneSplitter.apply {
-            val leftMenuPanel = LeftMenuPanel(controller)
-            val rightPanel = RightContentPanel(model)
             firstComponent = leftMenuPanel
+            emptyPanel.isVisible = false
             secondComponent = rightPanel
             splitterProportionKey = "com.github.dinbtechit.elasticsearch.dialogSplitKey"
             minimumSize = Dimension(780, 550)
@@ -77,25 +80,28 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
         // Subscribe To List Selection Events
         model.addPropertyChangeListener {
             if (it.newValue is Int && it.newValue == -1) {
-                oneSplitter.secondComponent = EmptyPanel()
+                oneSplitter.secondComponent = emptyPanel
+                emptyPanel.revalidate()
+                emptyPanel.repaint()
+                emptyPanel.isVisible = true
             } else {
-                oneSplitter.secondComponent = RightContentPanel(model)
-
+                oneSplitter.secondComponent = rightPanel
+                rightPanel.revalidate()
+                rightPanel.repaint()
+                rightPanel.isVisible = true
             }
         }
     }
 
-    inner class EmptyPanel: JPanel() {
+    inner class EmptyPanel : JPanel() {
+
+        val label = JBLabel("Add or modify connection").apply {
+            horizontalAlignment = SwingConstants.LEFT
+        }
+
         init {
             layout = GridBagLayout()
-            add(JBLabel("Add or Modify Connection", UIUtil.ComponentStyle.SMALL), GridBagConstraints().apply {
-                gridx = 0
-                gridy = 0
-                gridwidth = 10
-                gridheight = 1
-                weightx = 1.0
-                weighty = 1.0
-            })
+            add(label)
         }
     }
 }

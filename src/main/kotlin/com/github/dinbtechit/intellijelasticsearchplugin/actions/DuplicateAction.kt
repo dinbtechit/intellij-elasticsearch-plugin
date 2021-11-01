@@ -11,4 +11,8 @@ class DuplicateAction: AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         println("duplicate Clicked")
     }
+
+    override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = false
+    }
 }

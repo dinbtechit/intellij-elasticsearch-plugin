@@ -11,4 +11,8 @@ class ViewPropertiesAction: AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         println("View Properties Clicked")
     }
+
+    override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = false
+    }
 }

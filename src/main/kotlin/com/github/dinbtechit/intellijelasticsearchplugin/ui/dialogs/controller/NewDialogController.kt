@@ -18,16 +18,29 @@ class NewDialogController() {
         this.model = model
     }
 
-    fun getCounter(): ConnectionInfo {
-        return model!!.getConnectionInfo()
+    fun getAllConnections(): List<ConnectionInfo> {
+        return model!!.getAllConnectionInfos()
     }
 
-    fun selectConnectionInfo(i: ConnectionInfo) {
-        model!!.setConnectionInfo(i)
+    fun selectConnectionInfo(i: Any?) {
+        when (i) {
+            is ConnectionInfo -> model!!.setConnectionInfo(i)
+            is Int -> model!!.setConnectionInfo(i)
+        }
     }
+
 
     fun unselectConnectionInfo() {
         model!!.unselectCollectionInfo()
+    }
+
+    fun addConnection(i: ConnectionInfo) {
+        model!!.addConnection(i)
+        selectConnectionInfo(i)
+    }
+
+    fun deleteConnection(i: ConnectionInfo) {
+        model!!.deleteConnection(i)
     }
 }
 

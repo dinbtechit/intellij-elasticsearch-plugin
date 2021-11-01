@@ -9,7 +9,7 @@ import com.intellij.util.xmlb.annotations.XCollection
 import java.util.*
 
 @State(name = "org.github.dinbtechit.ElasticSearchConfig",
-    storages = [Storage("elasticsearch.config.xml")])
+    storages = [Storage("elasticsearch.config.xml", roamingType = RoamingType.PER_OS)])
 class ElasticSearchConfig : PersistentStateComponent<ElasticSearchConfig> {
 
     @XCollection(propertyElementName = "connections")

@@ -3,12 +3,15 @@ package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftco
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.AddAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DeleteAction
+import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DuplicateAction
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
-import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
-import com.github.dinbtechit.intellijelasticsearchplugin.shared.ProjectUtils
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.controller.NewDialogController
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel.EventType
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.components.JBList
@@ -16,19 +19,30 @@ import com.intellij.ui.components.JBScrollPane
 import icons.ElasticsearchIcons
 import java.awt.BorderLayout
 import java.awt.Color
-import javax.swing.JList
-import javax.swing.JPanel
-import javax.swing.ListSelectionModel
-import javax.swing.ScrollPaneConstants
+import java.beans.PropertyChangeEvent
+import javax.swing.*
 import javax.swing.border.EmptyBorder
 
 
-class LeftMenuPanel(private val controller: NewDialogController) : SimpleToolWindowPanel(true, true) {
+class LeftMenuPanel(
+    private val controller: NewDialogController,
+    private val modelListener: PropertyChangeModel
+) : SimpleToolWindowPanel(true, true) {
 
-    lateinit var connectionsListField: JBList<ConnectionInfo>
+    // fields
+    val addAction = AddAction(AllIcons.General.Add, controller)
+    val deleteAction = DeleteAction(AllIcons.General.Remove, controller)
+    val duplicateAction = DuplicateAction(AllIcons.Actions.Copy, controller)
+
+    val connectionListModel = DefaultListModel<ConnectionInfo>().apply {
+        addAll(controller.getAllConnections())
+    }
+    val connectionsListField: JBList<ConnectionInfo> = JBList(connectionListModel)
+
 
     init {
         initUIComponents()
+        subscribeToListeners()
     }
 
     companion object {
@@ -40,27 +54,25 @@ class LeftMenuPanel(private val controller: NewDialogController) : SimpleToolWin
         // ToolBar
         val group = DefaultActionGroup()
         val manager = ActionManager.getInstance()
-
-        val addAction = manager.getAction(AddAction.ID)
-        val deleteAction = manager.getAction(DeleteAction.ID)
         val refreshAction = manager.getAction(RefreshAction.ID)
 
         group.apply {
             add(addAction)
             add(deleteAction)
+            add(Separator())
             add(refreshAction)
+            add(duplicateAction)
         }
+
         val actionToolbar = manager.createActionToolbar("Elasticsearch", group, true)
         actionToolbar.setTargetComponent(this)
         toolbar = actionToolbar.component
 
 
         // List
-        val config = ElasticSearchConfig.getInstance(ProjectUtils().currentProject())
-        connectionsListField = JBList(config.state.connections).apply {
+        connectionsListField.apply {
             background = backgroundColor
             selectionMode = ListSelectionModel.SINGLE_SELECTION
-
         }
         connectionsListField.cellRenderer = ConnectionListCellRenderer()
 
@@ -79,17 +91,75 @@ class LeftMenuPanel(private val controller: NewDialogController) : SimpleToolWin
         setContent(panel)
 
         connectionsListField.addListSelectionListener { selectionEvent ->
-            if (!selectionEvent.valueIsAdjusting) {
+            if (!selectionEvent.valueIsAdjusting || connectionsListField.selectedIndex == -1) {
                 if (connectionsListField.selectedIndex != -1) {
-                    val connectionInfo = config.state.connections[connectionsListField.selectedIndex]
+                    val connectionInfo = connectionListModel[connectionsListField.selectedIndex]
                     controller.selectConnectionInfo(connectionInfo)
-                    println("Fireed Selection")
+                    /*println("Fired Selection")*/
                 } else {
                     controller.unselectConnectionInfo()
-                    println("Nothing is Selected")
+                    /*println("Nothing is Selected")*/
                 }
             }
         }
+    }
+
+    override fun getData(dataId: String): Any? {
+        super.getData(dataId)
+        if (PropertyChangeModel.DataKey.ES_CONNECTIONS.name == dataId) {
+            return connectionListModel
+        } else if (PropertyChangeModel.DataKey.SELECTED_CONNECTION.name == dataId) {
+            return connectionsListField.selectedValue
+        } else if (PropertyChangeModel.DataKey.SELECTED_CONNECTION_INDEX.name == dataId) {
+            return connectionsListField.selectedIndex
+        }
+        return null
+    }
+
+    private fun subscribeToListeners() {
+        modelListener.addPropertyChangeListener {
+            if (it.propertyName.equals(EventType.ADD_CONNECTION.name)) {
+                addConnection(it)
+            } else if (it.propertyName.equals(EventType.SELECTED.name)) {
+                selectConnection(it)
+            } else if (it.propertyName.equals(EventType.UNSELECTED.name)) {
+                unselectConnection()
+            }
+        }
+    }
+
+    private fun addConnection(it: PropertyChangeEvent) {
+        if (it.newValue is ConnectionInfo) {
+            connectionListModel.add(0, it.newValue as ConnectionInfo)
+            connectionsListField.selectedIndex = 0
+        }
+    }
+
+    private fun selectConnection(it: PropertyChangeEvent) {
+        val value = it.newValue
+        when (value) {
+            is ConnectionInfo -> {
+                val selectedIndex = connectionListModel.indexOf(value)
+                if (selectedIndex > -1) {
+                    connectionsListField.selectedIndex = selectedIndex
+                    DeleteAction.ENABLED = true
+                    DuplicateAction.ENABLED = true
+                }
+            }
+            is Int -> {
+                if (value != -1) {
+                    connectionsListField.selectedIndex = value
+                    DeleteAction.ENABLED = true
+                    DuplicateAction.ENABLED = true
+                }
+            }
+        }
+    }
+
+    private fun unselectConnection() {
+        val disable = false
+        DeleteAction.ENABLED = disable
+        DuplicateAction.ENABLED = disable
     }
 
 

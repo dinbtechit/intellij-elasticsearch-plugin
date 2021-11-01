@@ -52,22 +52,6 @@
                 text="Elasticsearch: View Properties">
             <override-text place="ToolwindowContent" text="View Properties"/>
         </action>
-
-        <!--dialog actions-->
-        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.AddAction"
-                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.AddAction"
-                icon="AllIcons.General.Add"
-                text="New">
-            <override-text place="ToolwindowContent" text="New Connection"/>
-        </action>
-
-        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.DeleteAction"
-                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DeleteAction"
-                icon="AllIcons.General.Remove"
-                text="Remove">
-            <override-text place="ToolwindowContent" text="New Connection"/>
-        </action>
-
     </actions>
 
     <applicationListeners>
