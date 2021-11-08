@@ -16,7 +16,8 @@ class DialogModelController {
         DELETE_CONNECTION,
         ENABLE_APPLY_ACTION,
         DUPLICATE,
-        SAVE
+        SAVE,
+        NAME_CHANGE
     }
 
     class DataKey {
@@ -69,7 +70,9 @@ class DialogModelController {
     }
 
     fun duplicate(connections: List<ConnectionInfo>) {
-
     }
 
+    fun changeName(newValue: String) {
+        pcs.firePropertyChange(EventType.NAME_CHANGE.name, -1, newValue)
+    }
 }

@@ -10,7 +10,7 @@ import java.awt.*
 import javax.swing.*
 
 
-class ConfigurationTabPanel(model: DialogModelController) : JPanel() {
+class ConfigurationTabPanel(controller: DialogModelController) : JPanel() {
 
     // Fields
     private val hostLabel = JLabel()
@@ -36,7 +36,7 @@ class ConfigurationTabPanel(model: DialogModelController) : JPanel() {
         name = "ConfigurationTabPanel"
         layout = BorderLayout(0, 0)
         initUIComponents()
-        model.addPropertyChangeListener {
+        controller.addPropertyChangeListener {
             if (it.newValue is ConnectionInfo) {
                 val newValue = it.newValue as ConnectionInfo
                 this.hostTextField.text = newValue.hostname

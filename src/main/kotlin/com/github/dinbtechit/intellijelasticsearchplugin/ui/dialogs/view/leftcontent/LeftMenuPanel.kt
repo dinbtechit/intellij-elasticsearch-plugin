@@ -15,6 +15,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import com.jetbrains.rd.framework.base.deepClonePolymorphic
 import icons.ElasticsearchIcons
 import java.awt.BorderLayout
 import java.awt.Color
@@ -28,12 +29,12 @@ class LeftMenuPanel(
 ) : SimpleToolWindowPanel(true, true) {
 
     // fields
-    val addAction = AddAction(AllIcons.General.Add, controller)
-    val deleteAction = DeleteAction(AllIcons.General.Remove, controller)
-    val duplicateAction = DuplicateAction(AllIcons.Actions.Copy, controller)
+    private val addAction = AddAction(AllIcons.General.Add, controller)
+    private val deleteAction = DeleteAction(AllIcons.General.Remove, controller)
+    private val duplicateAction = DuplicateAction(AllIcons.Actions.Copy, controller)
 
-    val connectionListModel = DefaultListModel<ConnectionInfo>().apply {
-        addAll(controller.getAllConnectionInfos())
+    private val connectionListModel = DefaultListModel<ConnectionInfo>().apply {
+        addAll(controller.getAllConnectionInfos().deepClonePolymorphic())
     }
     val connectionsListField: JBList<ConnectionInfo> = JBList(connectionListModel).apply {
         selectedIndex = 0
@@ -121,7 +122,18 @@ class LeftMenuPanel(
                 it.propertyName.equals(EventType.SELECTED.name) -> selectConnection(it)
                 it.propertyName.equals(EventType.UNSELECTED.name) -> unselectConnection()
                 it.propertyName.equals(EventType.SAVE.name) -> saveConnection(connectionListModel.elements().toList())
+                it.propertyName.equals(EventType.NAME_CHANGE.name) -> nameChange(it)
+
             }
+        }
+    }
+
+    private fun nameChange(it: PropertyChangeEvent) {
+        if (it.newValue is String) {
+            val newName = it.newValue as String
+            connectionListModel.get(connectionsListField.selectedIndex).name = newName
+            connectionsListField.revalidate()
+            connectionsListField.repaint()
         }
     }
 

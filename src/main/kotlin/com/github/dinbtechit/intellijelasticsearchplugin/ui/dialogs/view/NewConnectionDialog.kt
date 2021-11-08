@@ -24,13 +24,13 @@ import javax.swing.border.MatteBorder
 class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
 
-    private var model = DialogModelController()
+    private var controller = DialogModelController()
     private val oneSplitter = OnePixelSplitter(false, .3f)
 
     // Components
     private val emptyPanel = EmptyPanel()
-    private val leftMenuPanel = LeftMenuPanel(model)
-    private val rightPanel = RightContentPanel(model)
+    private val leftMenuPanel = LeftMenuPanel(controller)
+    private val rightPanel = RightContentPanel(controller)
     private var applyAction: Action? = null
 
     init {
@@ -45,14 +45,14 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
     override fun doOKAction() {
         if (okAction.isEnabled) {
-            model.saveConnectionChanges()
+            controller.saveConnectionChanges()
             close(OK_EXIT_CODE)
         }
     }
 
     internal fun doApplyAction(e: ActionEvent) {
         if (applyAction!!.isEnabled) {
-            model.saveConnectionChanges()
+            controller.saveConnectionChanges()
         }
     }
 
@@ -79,17 +79,20 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
     private fun subscribeToListeners() {
         // Subscribe To List Selection Events
-        model.addPropertyChangeListener {
-            if (it.newValue is Int && it.newValue == -1) {
-                oneSplitter.secondComponent = emptyPanel
-                emptyPanel.revalidate()
-                emptyPanel.repaint()
-                emptyPanel.isVisible = true
-            } else {
-                oneSplitter.secondComponent = rightPanel
-                rightPanel.revalidate()
-                rightPanel.repaint()
-                rightPanel.isVisible = true
+        controller.addPropertyChangeListener {
+            if (it.propertyName == DialogModelController.EventType.UNSELECTED.name
+                || it.propertyName == DialogModelController.EventType.SELECTED.name) {
+                if (it.newValue is Int && it.newValue == -1) {
+                    oneSplitter.secondComponent = emptyPanel
+                    emptyPanel.revalidate()
+                    emptyPanel.repaint()
+                    emptyPanel.isVisible = true
+                } else {
+                    oneSplitter.secondComponent = rightPanel
+                    rightPanel.revalidate()
+                    rightPanel.repaint()
+                    rightPanel.isVisible = true
+                }
             }
         }
     }

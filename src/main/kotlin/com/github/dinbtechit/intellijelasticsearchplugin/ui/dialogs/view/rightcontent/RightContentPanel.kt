@@ -5,10 +5,14 @@ import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelC
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.*
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import javax.swing.*
 import javax.swing.border.MatteBorder
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
-class RightContentPanel(private val modelListener: DialogModelController) : JPanel() {
+class RightContentPanel(private val controller: DialogModelController) : JPanel() {
 
     // Fields
     private val nameTextField: JTextField = JTextField()
@@ -20,19 +24,19 @@ class RightContentPanel(private val modelListener: DialogModelController) : JPan
     private val bottomPanel = JPanel()
 
     // Style/Constrains
-    private val gridBagConstraints =  GridBagConstraints()
+    private val gridBagConstraints = GridBagConstraints()
 
     init {
         layout = BorderLayout(0, 0)
         initUIComponents()
-        modelListener.addPropertyChangeListener {
+        controller.addPropertyChangeListener {
             if (it.newValue is ConnectionInfo) {
                 val newValue = it.newValue as ConnectionInfo
                 nameTextField.text = newValue.name
             }
         }
-        modelListener.addConnection()
-        modelListener.selectConnectionInfo(0)
+        controller.addConnection()
+        controller.selectConnectionInfo(0)
     }
 
     private fun initUIComponents() {
@@ -64,6 +68,11 @@ class RightContentPanel(private val modelListener: DialogModelController) : JPan
             add(nameTextField.apply {
                 minimumSize = Dimension(400, 30)
                 preferredSize = Dimension(400, 30)
+                addKeyListener(object: KeyAdapter() {
+                    override fun keyReleased(e: KeyEvent?) {
+                        controller.changeName(nameTextField.text)
+                    }
+                })
             }, gridBagConstraints.apply {
                 gridx = 1
                 gridy = 0
@@ -81,7 +90,7 @@ class RightContentPanel(private val modelListener: DialogModelController) : JPan
             // Content Starts
             // 1. Configuration Tab
             name = "tabbedPanel"
-            add("Configuration", JBScrollPane(ConfigurationTabPanel(modelListener)).apply {
+            add("Configuration", JBScrollPane(ConfigurationTabPanel(controller)).apply {
                 border = BorderFactory.createEmptyBorder()
                 verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
                 horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
@@ -97,8 +106,8 @@ class RightContentPanel(private val modelListener: DialogModelController) : JPan
         add(tabbedPanel, BorderLayout.CENTER)
         // End of Tabbed Panel
 
-        bottomPanel.apply{
-            preferredSize = Dimension( Int.MAX_VALUE, 50)
+        bottomPanel.apply {
+            preferredSize = Dimension(Int.MAX_VALUE, 50)
             isVisible = tabbedPanel.selectedIndex == 0
             border = MatteBorder(1, 0, 1, 0, Color.decode("#2F3233"))
         }
