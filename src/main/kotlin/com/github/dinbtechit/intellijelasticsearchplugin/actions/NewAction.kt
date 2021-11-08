@@ -13,5 +13,6 @@ class NewAction : AnAction() {
         if (NewConnectionDialog(e.project!!).showAndGet()) {
             println("New Clicked")
         }
+
     }
 }

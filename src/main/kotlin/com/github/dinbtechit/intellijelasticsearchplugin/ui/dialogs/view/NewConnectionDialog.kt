@@ -1,8 +1,6 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view
 
-import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.controller.NewDialogController
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.LeftMenuPanel
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightcontent.RightContentPanel
 import com.intellij.openapi.project.Project
@@ -10,27 +8,30 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.layout.panel
+import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.GridBagLayout
+import java.awt.event.ActionEvent
+import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.SwingConstants
 import javax.swing.border.Border
 import javax.swing.border.MatteBorder
 
 
 class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
-    private var model = PropertyChangeModel()
-    private val controller = NewDialogController(model)
+
+    private var model = DialogModelController()
     private val oneSplitter = OnePixelSplitter(false, .3f)
 
     // Components
     private val emptyPanel = EmptyPanel()
-    private val leftMenuPanel = LeftMenuPanel(controller, model)
+    private val leftMenuPanel = LeftMenuPanel(model)
     private val rightPanel = RightContentPanel(model)
+    private var applyAction: Action? = null
 
     init {
         title = "New Elasticsearch Connections"
@@ -44,14 +45,14 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
     override fun doOKAction() {
         if (okAction.isEnabled) {
-            val config = ElasticSearchConfig.getInstance(project)
-            /*config.state.connections.add(
-                ConnectionInfo(name = "some randome")
-            )*/
-            for (connection in config.state.connections) {
-                println(connection)
-            }
+            model.saveConnectionChanges()
             close(OK_EXIT_CODE)
+        }
+    }
+
+    internal fun doApplyAction(e: ActionEvent) {
+        if (applyAction!!.isEnabled) {
+            model.saveConnectionChanges()
         }
     }
 
@@ -96,7 +97,8 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
     inner class EmptyPanel : JPanel() {
 
         val label = JBLabel("Add or modify connection").apply {
-            horizontalAlignment = SwingConstants.LEFT
+            componentStyle = UIUtil.ComponentStyle.SMALL
+            fontColor = UIUtil.FontColor.BRIGHTER
         }
 
         init {
@@ -104,4 +106,16 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
             add(label)
         }
     }
+
+    override fun createActions(): Array<Action> {
+        applyAction = ApplyAction()
+        return super.createActions().plus(applyAction!!)
+    }
+
+    private inner class ApplyAction : DialogWrapperAction("Apply") {
+        override fun doAction(e: ActionEvent?) {
+            doApplyAction(e!!)
+        }
+    }
+
 }

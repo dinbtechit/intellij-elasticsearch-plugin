@@ -5,9 +5,8 @@ import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.AddAc
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DeleteAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DuplicateAction
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.controller.NewDialogController
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel.EventType
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController.EventType
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -25,8 +24,7 @@ import javax.swing.border.EmptyBorder
 
 
 class LeftMenuPanel(
-    private val controller: NewDialogController,
-    private val modelListener: PropertyChangeModel
+    private val controller: DialogModelController
 ) : SimpleToolWindowPanel(true, true) {
 
     // fields
@@ -35,9 +33,11 @@ class LeftMenuPanel(
     val duplicateAction = DuplicateAction(AllIcons.Actions.Copy, controller)
 
     val connectionListModel = DefaultListModel<ConnectionInfo>().apply {
-        addAll(controller.getAllConnections())
+        addAll(controller.getAllConnectionInfos())
     }
-    val connectionsListField: JBList<ConnectionInfo> = JBList(connectionListModel)
+    val connectionsListField: JBList<ConnectionInfo> = JBList(connectionListModel).apply {
+        selectedIndex = 0
+    }
 
 
     init {
@@ -95,10 +95,8 @@ class LeftMenuPanel(
                 if (connectionsListField.selectedIndex != -1) {
                     val connectionInfo = connectionListModel[connectionsListField.selectedIndex]
                     controller.selectConnectionInfo(connectionInfo)
-                    /*println("Fired Selection")*/
                 } else {
-                    controller.unselectConnectionInfo()
-                    /*println("Nothing is Selected")*/
+                    controller.unselectCollectionInfo()
                 }
             }
         }
@@ -106,32 +104,56 @@ class LeftMenuPanel(
 
     override fun getData(dataId: String): Any? {
         super.getData(dataId)
-        if (PropertyChangeModel.DataKey.ES_CONNECTIONS.name == dataId) {
+        if (DialogModelController.DataKey.ES_CONNECTIONS.name == dataId) {
             return connectionListModel
-        } else if (PropertyChangeModel.DataKey.SELECTED_CONNECTION.name == dataId) {
+        } else if (DialogModelController.DataKey.SELECTED_CONNECTION.name == dataId) {
             return connectionsListField.selectedValue
-        } else if (PropertyChangeModel.DataKey.SELECTED_CONNECTION_INDEX.name == dataId) {
+        } else if (DialogModelController.DataKey.SELECTED_CONNECTION_INDEX.name == dataId) {
             return connectionsListField.selectedIndex
         }
         return null
     }
 
     private fun subscribeToListeners() {
-        modelListener.addPropertyChangeListener {
-            if (it.propertyName.equals(EventType.ADD_CONNECTION.name)) {
-                addConnection(it)
-            } else if (it.propertyName.equals(EventType.SELECTED.name)) {
-                selectConnection(it)
-            } else if (it.propertyName.equals(EventType.UNSELECTED.name)) {
-                unselectConnection()
+        controller.addPropertyChangeListener {
+            when {
+                it.propertyName.equals(EventType.ADD_CONNECTION.name) -> addConnection(it)
+                it.propertyName.equals(EventType.SELECTED.name) -> selectConnection(it)
+                it.propertyName.equals(EventType.UNSELECTED.name) -> unselectConnection()
+                it.propertyName.equals(EventType.SAVE.name) -> saveConnection(connectionListModel.elements().toList())
             }
         }
     }
 
+    private fun saveConnection(connections: List<ConnectionInfo>) {
+        controller.save(connections)
+    }
+
     private fun addConnection(it: PropertyChangeEvent) {
         if (it.newValue is ConnectionInfo) {
-            connectionListModel.add(0, it.newValue as ConnectionInfo)
-            connectionsListField.selectedIndex = 0
+            val allConnections = connectionListModel
+            var nextNameIndex = allConnections.elements().toList().stream()
+                .map { a -> a.name }
+                .filter {
+                    it.matches(Regex("^@localhost([0-9]+)?$"))
+                }.count()
+            val lastValue = allConnections.elements().toList().stream()
+                .map { a -> a.name }
+                .filter {
+                    it.matches(Regex("^@localhost([0-9]+)?$"))
+                }.findFirst().orElse("")
+
+            val nextName = if (nextNameIndex.compareTo(0) == 0) {
+                "@localhost"
+            } else {
+                if ("@localhost$nextNameIndex" == lastValue) {
+                    nextNameIndex++; "@localhost$nextNameIndex"
+                } else "@localhost$nextNameIndex"
+            }
+            val connectionInfo = ConnectionInfo().apply {
+                name = nextName
+            }
+            allConnections.add(0, connectionInfo)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model
+package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs
 
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
@@ -7,13 +7,16 @@ import java.beans.PropertyChangeListener
 import javax.swing.event.SwingPropertyChangeSupport
 
 
-class PropertyChangeModel {
+class DialogModelController {
 
     enum class EventType {
         SELECTED,
         UNSELECTED,
         ADD_CONNECTION,
-        DELETE_CONNECTION
+        DELETE_CONNECTION,
+        ENABLE_APPLY_ACTION,
+        DUPLICATE,
+        SAVE
     }
 
     class DataKey {
@@ -37,11 +40,16 @@ class PropertyChangeModel {
         pcs.addPropertyChangeListener(l)
     }
 
+    fun addConnection() {
+        val connection = ConnectionInfo()
+        pcs.firePropertyChange(EventType.ADD_CONNECTION.name, -1, connection)
+    }
+
     fun getAllConnectionInfos(): MutableList<ConnectionInfo> {
         return listOfConnections
     }
 
-    fun setConnectionInfo(i: Any) {
+    fun selectConnectionInfo(i: Any) {
         val oldValue = -1
         pcs.firePropertyChange(EventType.SELECTED.name, oldValue, i)
     }
@@ -51,17 +59,17 @@ class PropertyChangeModel {
         pcs.firePropertyChange(EventType.UNSELECTED.name, oldValue, -1)
     }
 
-    fun addConnection(i: ConnectionInfo) {
-        val oldValue = connectionInfo
-        listOfConnections.add(0, i)
-        pcs.firePropertyChange(EventType.ADD_CONNECTION.name, oldValue, i)
+
+    fun saveConnectionChanges() {
+        pcs.firePropertyChange(EventType.SAVE.name, 1, -1)
     }
 
-    fun deleteConnection(i: ConnectionInfo) {
-        val oldValue = connectionInfo
-        listOfConnections.remove(i)
-        pcs.firePropertyChange(EventType.DELETE_CONNECTION.name, oldValue, i)
+    fun save(connections: List<ConnectionInfo>) {
+        config.state.connections = connections.toMutableList()
     }
 
+    fun duplicate(connections: List<ConnectionInfo>) {
+
+    }
 
 }

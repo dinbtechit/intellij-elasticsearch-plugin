@@ -1,13 +1,14 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog
 
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.controller.NewDialogController
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import javax.swing.Icon
 
 class DuplicateAction(
     private val icon: Icon,
-    private val controller: NewDialogController): AnAction(icon) {
+    private val controller: DialogModelController
+) : AnAction(icon) {
     companion object {
         const val ID = "com.github.dinbtechit.elasticsearch.newdialog.actions.DuplicateAction"
         var ENABLED = false

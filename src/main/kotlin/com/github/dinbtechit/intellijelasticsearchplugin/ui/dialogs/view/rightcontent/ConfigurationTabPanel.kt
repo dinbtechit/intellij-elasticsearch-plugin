@@ -1,7 +1,7 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightcontent
 
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.uiDesigner.core.Spacer
@@ -10,7 +10,7 @@ import java.awt.*
 import javax.swing.*
 
 
-class ConfigurationTabPanel(model: PropertyChangeModel) : JPanel() {
+class ConfigurationTabPanel(model: DialogModelController) : JPanel() {
 
     // Fields
     private val hostLabel = JLabel()
@@ -135,8 +135,7 @@ class ConfigurationTabPanel(model: PropertyChangeModel) : JPanel() {
     }
 
     private fun createGbc(x: Int, y: Int, isLastElement: Boolean = false): GridBagConstraints {
-        val WEST_INSETS = Insets(5, 0, 5, 5)
-        val EAST_INSETS = Insets(5, 5, 5, 0)
+        val westInsects = Insets(5, 0, 5, 5)
         return GridBagConstraints().apply {
             gridx = x
             gridy = y
@@ -144,7 +143,7 @@ class ConfigurationTabPanel(model: PropertyChangeModel) : JPanel() {
             gridheight = if (isLastElement) 10 else 1
             anchor = if (x == 0) GridBagConstraints.WEST else GridBagConstraints.LINE_START
             fill = if (x == 0) GridBagConstraints.BOTH else GridBagConstraints.REMAINDER
-            insets = WEST_INSETS
+            insets = westInsects
             weightx = if (x == 0 || x == 2) 0.1 else 1.0
             weighty = if (isLastElement) 1.0 else 0.0
         }

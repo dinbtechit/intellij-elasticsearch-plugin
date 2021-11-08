@@ -1,14 +1,14 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightcontent
 
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
-import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.model.PropertyChangeModel
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.*
 import javax.swing.*
 import javax.swing.border.MatteBorder
 
-class RightContentPanel(private val modelListener: PropertyChangeModel) : JPanel() {
+class RightContentPanel(private val modelListener: DialogModelController) : JPanel() {
 
     // Fields
     private val nameTextField: JTextField = JTextField()
@@ -31,6 +31,8 @@ class RightContentPanel(private val modelListener: PropertyChangeModel) : JPanel
                 nameTextField.text = newValue.name
             }
         }
+        modelListener.addConnection()
+        modelListener.selectConnectionInfo(0)
     }
 
     private fun initUIComponents() {
