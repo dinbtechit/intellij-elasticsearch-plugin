@@ -4,6 +4,7 @@ import com.github.dinbtechit.intellijelasticsearchplugin.services.state.Connecti
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import javax.swing.DefaultListModel
 import javax.swing.Icon
 
 class AddAction(
@@ -12,13 +13,13 @@ class AddAction(
 ) : AnAction("New", "Create new connection", icon) {
 
     override fun actionPerformed(e: AnActionEvent) {
-        val allConnections = e.getData(DialogModelController.DataKey.ES_CONNECTIONS) as MutableList<ConnectionInfo>
-        var nextNameIndex = allConnections.stream()
+        val allConnections = e.getData(DialogModelController.DataKey.ES_CONNECTIONS) as DefaultListModel<ConnectionInfo>
+        var nextNameIndex = allConnections.elements().toList().stream()
             .map { a -> a.name }
             .filter {
                 it.matches(Regex("^@localhost([0-9]+)?$"))
             }.count()
-        val lastValue = allConnections.stream()
+        val lastValue = allConnections.elements().toList().stream()
             .map { a -> a.name }
             .filter {
                 it.matches(Regex("^@localhost([0-9]+)?$"))
