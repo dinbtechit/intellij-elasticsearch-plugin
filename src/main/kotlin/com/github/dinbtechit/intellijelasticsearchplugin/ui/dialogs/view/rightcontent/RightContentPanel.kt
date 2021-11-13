@@ -9,8 +9,6 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.*
 import javax.swing.border.MatteBorder
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 
 class RightContentPanel(private val controller: DialogModelController) : JPanel() {
 
@@ -68,7 +66,7 @@ class RightContentPanel(private val controller: DialogModelController) : JPanel(
             add(nameTextField.apply {
                 minimumSize = Dimension(400, 30)
                 preferredSize = Dimension(400, 30)
-                addKeyListener(object: KeyAdapter() {
+                addKeyListener(object : KeyAdapter() {
                     override fun keyReleased(e: KeyEvent?) {
                         controller.changeName(nameTextField.text)
                     }
