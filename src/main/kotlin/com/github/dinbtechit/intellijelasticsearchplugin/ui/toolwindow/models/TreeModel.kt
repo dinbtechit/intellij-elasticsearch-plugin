@@ -12,7 +12,7 @@ import javax.swing.tree.DefaultTreeModel
 
 class ElasticsearchTreeModel(
     private val connectionInfos: List<ConnectionInfo>,
-    private val rootNode: DefaultMutableTreeNode = DefaultMutableTreeNode("Elasticsearch")
+    private val rootNode: ElasticsearchTreeNode<String> = ElasticsearchTreeNode(null, "Elasticsearch")
 ) : DefaultTreeModel(rootNode) {
 
     init {
@@ -88,7 +88,7 @@ class ElasticsearchTreeNode<T>(
         if (childIcon != null) {
             if (childData != null && childData.isNotEmpty()) {
                 for (d in childData) add(ElasticsearchTreeNode(childIcon, d))
-            } else add(ElasticsearchTreeNode(null, Empty("<none>")))
+            } else add(ElasticsearchTreeNode(null, Empty("<empty>")))
         }
     }
 

@@ -30,10 +30,12 @@ class ElasticsearchTree : Tree(), DumbAware {
         showsRootHandles = true
         treeSpeedSearch = TreeSpeedSearch(this, { treePath ->
             val node = treePath.lastPathComponent as ElasticsearchTreeNode<*>
-            val userObject = node.data
-            if (userObject is ConnectionInfo) {
-                userObject.name
-            } else "<empty>"
+            when (node.data) {
+                is ConnectionInfo -> node.data.name
+                is ElasticsearchDocument.Types -> node.data.value
+                is ElasticsearchDocument -> node.data.name
+                else -> "<empty>"
+            }
         }, true)
     }
 
@@ -58,8 +60,11 @@ class ElasticsearchTree : Tree(), DumbAware {
                     is ElasticsearchDocument.Types -> {
                         append(value.data.value)
                         val count = if ((value.childCount == 1) &&
-                            ((value.children().toList().first() as ElasticsearchTreeNode<*>).data is ElasticsearchTreeNode.Empty)
-                        ) { 0 } else value.childCount
+                            ((value.children().toList()
+                                .first() as ElasticsearchTreeNode<*>).data is ElasticsearchTreeNode.Empty)
+                        ) {
+                            0
+                        } else value.childCount
 
                         append(" $count", SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES)
                     }
