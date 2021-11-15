@@ -7,9 +7,13 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.uiDesigner.core.Spacer
 import com.intellij.util.ui.UIUtil
+import org.apache.http.client.utils.URIBuilder
 import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.net.MalformedURLException
+import java.net.URI
+import java.net.URL
 import javax.swing.*
 
 
@@ -48,7 +52,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                         val newValue = it.newValue as ConnectionInfo
                         connectionInfo = newValue
                         this.hostTextField.text = newValue.hostname
-                        this.portTextField.text = newValue.port.toString()
+                        this.portTextField.text = if (newValue.port != -1) newValue.port.toString() else ""
                         this.userTextField.text = newValue.username
                         if (newValue.password != null && newValue.password!!.isNotEmpty()) {
                             this.passwordField.text = String(newValue.password!!)
@@ -84,6 +88,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
             }, createGbc(0, 0))
             add(Box.createHorizontalStrut(300))
             add(hostTextField.apply {
+                name = "hostTextField"
                 minimumSize = Dimension(300, 30)
                 preferredSize = Dimension(300, 30)
                 addKeyListener(AddKeyListener())
@@ -97,6 +102,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                 preferredSize = Dimension(50, 30)
             }, createGbc(2, 0))
             add(portTextField.apply {
+                name = "portTextField"
                 minimumSize = Dimension(100, 30)
                 preferredSize = Dimension(100, 30)
                 addKeyListener(AddKeyListener())
@@ -159,8 +165,10 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                 preferredSize = Dimension(50, 30)
             }, createGbc(0, 5))
             add(urlTextField.apply {
+                name = "urlTextField"
                 minimumSize = Dimension(300, 30)
                 preferredSize = Dimension(300, 30)
+                addKeyListener(AddKeyListener())
             }, createGbc(1, 5))
 
             add(urlHelpTextLabel.apply {
@@ -180,7 +188,61 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
 
     inner class AddKeyListener : KeyAdapter() {
         override fun keyReleased(e: KeyEvent?) {
-            println(e?.component)
+
+            val valid = when {
+                e != null -> {
+                    (e.keyCode in 48..57) // number keys
+                            || (e.keyCode in 65..90) // letter keys
+                            || (e.keyCode in 96..111) // numpad keys
+                            || (e.keyCode in 192..192) // ;=,-./` (in orde
+                            || (e.keyCode == 8) // backspace
+                            || (e.keyCode == 127) // delete
+                }
+                else -> false
+            }
+
+            /*if (valid.not()) return*/
+
+            if (e?.component?.name == "portTextField" || e?.component?.name == "hostTextField") {
+                var currentUrl: URI? = null
+                fun buildUrl(urlStr: String) = URIBuilder().apply {
+                    val url = URL(urlStr)
+                    scheme = url.protocol
+                    host = url.host.trim()
+                    port = url.port
+                    path = url.path.trim()
+                }.build()
+
+                try {
+                    currentUrl = buildUrl(urlTextField.text)
+                } catch (e: MalformedURLException) {
+                }
+                if (currentUrl == null) {
+                    currentUrl = buildUrl("http://localhost:9200")
+                }
+                val newUrl = URIBuilder(currentUrl)
+                newUrl.apply {
+                    host = hostTextField.text.trim()
+                    if (!portTextField.text.isNullOrEmpty()) {
+                        port = Integer.valueOf(portTextField.text) ?: -1
+                    } else port = -1
+                }
+                urlTextField.text = newUrl.build().toString()
+
+            } else if (e?.component?.name == "urlTextField") {
+                val url = try {
+                    URL(urlTextField.text)
+                } catch (e: Exception) {
+                    null
+                }
+                if (url != null) {
+                    hostTextField.text = url.host
+                    portTextField.text = if (url.port != -1) url.port.toString() else ""
+                } else {
+                    hostTextField.text = ""
+                    portTextField.text = ""
+                }
+            }
             updateConnectionInfo()
         }
     }
@@ -189,9 +251,11 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
         controller.updateConnectionInfo(
             connectionInfo.apply {
                 hostname = hostTextField.text
-                port =
+                port = try {
                     Integer.valueOf(portTextField.text)
-                        ?: throw NumberFormatException("Port has to be a valid number")
+                } catch (e: NumberFormatException) {
+                    -1
+                }
                 authenticationType = authTypeComboBox.selectedIndex
                 username = userTextField.text
                 password = passwordField.password

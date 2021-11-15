@@ -3,11 +3,13 @@ package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfoState
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
+import com.github.dinbtechit.intellijelasticsearchplugin.services.state.getAllConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.shared.ProjectUtils
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.Constants.CREDS_SERVICE_NAME
 import com.intellij.credentialStore.Credentials
 import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.remoteServer.util.CloudConfigurationUtil.createCredentialAttributes
 import java.beans.PropertyChangeListener
 import javax.swing.event.SwingPropertyChangeSupport
@@ -45,7 +47,6 @@ class DialogModelController {
     private val config = ElasticSearchConfig.getInstance(ProjectUtils().currentProject())
 
     private var connectionInfo: ConnectionInfo = ConnectionInfo()
-    private val listOfConnections = config.state.connections
     private var pcs: SwingPropertyChangeSupport = SwingPropertyChangeSupport(this)
 
     fun addPropertyChangeListener(l: PropertyChangeListener?) {
@@ -58,25 +59,7 @@ class DialogModelController {
     }
 
     fun getAllConnectionInfos(): MutableList<ConnectionInfo> {
-        val connectionInfos = mutableListOf<ConnectionInfo>()
-        for (c in listOfConnections) {
-            val newConnectionInfo = ConnectionInfo()
-            val credentialAttributes = createCredentialAttributes(CREDS_SERVICE_NAME, c.uuid)
-            if (credentialAttributes != null) {
-                val credentials = PasswordSafe.instance.get(credentialAttributes)
-                connectionInfos.add(newConnectionInfo.apply {
-                    uuid = c.uuid
-                    name = c.name
-                    hostname = c.hostname
-                    port = c.port
-                    authenticationType = c.authenticationType
-                    username = c.username
-                    password = credentials?.password?.toCharArray()
-                    url = c.url
-                })
-            }
-        }
-        return connectionInfos
+        return config.getAllConnectionInfo()
     }
 
     fun save(connections: List<ConnectionInfo>) {
@@ -95,12 +78,12 @@ class DialogModelController {
             }
             connectionInfoState.add(newConnectionInfoState)
 
-            val credentialAttributes = createCredentialAttributes(CREDS_SERVICE_NAME, conn.uuid)
+            val credentialAttributes = createCredentialAttributes("$CREDS_SERVICE_NAME - ${conn.uuid}", conn.uuid)
             val credentials = if (credentialAttributes != null
                 && conn.password != null && conn.password!!.isNotEmpty()
                 && conn.authenticationType != 1
             ) {
-                Credentials(conn.username, conn.password)
+                Credentials("", conn.password)
             } else null
 
             if (credentialAttributes != null) {
@@ -124,10 +107,6 @@ class DialogModelController {
     fun saveConnectionChanges() {
         pcs.firePropertyChange(EventType.SAVE.name, 1, -1)
         ApplicationManager.getApplication().saveAll()
-    }
-
-    fun duplicate(connections: List<ConnectionInfo>) {
-        println("Duplicate")
     }
 
     fun changeName(newValue: String) {

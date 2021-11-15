@@ -1,7 +1,10 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.services.state
 
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.Constants
+import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
+import com.intellij.remoteServer.util.CloudConfigurationUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
@@ -29,6 +32,29 @@ class ElasticSearchConfig : PersistentStateComponent<ElasticSearchConfig> {
     override fun loadState(state: ElasticSearchConfig) = XmlSerializerUtil.copyBean(state, this)
 }
 
+fun ElasticSearchConfig.getAllConnectionInfo(): MutableList<ConnectionInfo> {
+    val connectionInfos = mutableListOf<ConnectionInfo>()
+    for (c in connections) {
+        val newConnectionInfo = ConnectionInfo()
+        val credentialAttributes =
+            CloudConfigurationUtil.createCredentialAttributes("${Constants.CREDS_SERVICE_NAME} - ${c.uuid}", c.uuid)
+        if (credentialAttributes != null) {
+            val credentials = PasswordSafe.instance.get(credentialAttributes)
+            connectionInfos.add(newConnectionInfo.apply {
+                uuid = c.uuid
+                name = c.name
+                hostname = c.hostname
+                port = c.port
+                authenticationType = c.authenticationType
+                username = c.username
+                password = credentials?.password?.toCharArray()
+                url = c.url
+            })
+        }
+    }
+    return connectionInfos
+}
+
 
 @Tag("connection-info")
 data class ConnectionInfoState(
@@ -37,7 +63,7 @@ data class ConnectionInfoState(
     @Attribute
     var uuid: String = UUID.randomUUID().toString(),
     @Tag
-    var url: String = "",
+    var url: String = "http://localhost:9200",
     @Tag
     var protocol: String = "",
     @Tag
@@ -53,7 +79,7 @@ data class ConnectionInfoState(
 data class ConnectionInfo(
     var name: String = "",
     var uuid: String = UUID.randomUUID().toString(),
-    var url: String = "",
+    var url: String = "http://localhost:9200",
     var protocol: String = "",
     var hostname: String = "localhost",
     var port: Int = 9200,

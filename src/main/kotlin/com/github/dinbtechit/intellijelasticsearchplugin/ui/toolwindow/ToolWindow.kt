@@ -4,10 +4,8 @@ import com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction
-import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.DumbAware
@@ -79,9 +77,9 @@ class ToolWindowContents(
             )
         )
 
-        val esTree = ElasticSearchConnectionTree("@Elasticsearch - Dev")
+        val esTree = ElasticsearchTree()
         val jbScrollPane = JBScrollPane(
-            esTree.tree,
+            esTree,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
         )
@@ -90,25 +88,6 @@ class ToolWindowContents(
             fill = GridConstraints.FILL_BOTH
         })
         return panel
-    }
-
-    private fun initToolbar(toolbar: JPanel) {
-        val manager = ActionManager.getInstance()
-        val newAction = manager.getAction(NewAction.ID)
-        val refreshAction = manager.getAction(RefreshAction.ID)
-        val duplicateAction = manager.getAction(DuplicateAction.ID)
-
-
-        val toolbarActionGroup = DefaultActionGroup().apply {
-            add(newAction)
-            add(duplicateAction)
-            addSeparator()
-            add(refreshAction)
-        }
-
-        val actionToolbar = manager.createActionToolbar(ActionPlaces.TOOLWINDOW_TITLE, toolbarActionGroup, true)
-        actionToolbar.setTargetComponent(this)
-        toolbar.add(actionToolbar.component)
     }
 
     override fun dispose() {
