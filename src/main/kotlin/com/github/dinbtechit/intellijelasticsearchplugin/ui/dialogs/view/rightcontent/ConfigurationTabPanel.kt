@@ -75,7 +75,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
             // Settings
             layout = GridBagLayout()
             preferredSize = Dimension(500, 300)
-            border = BorderFactory.createEmptyBorder(10, 5, 8, 0)
+            border = BorderFactory.createEmptyBorder(10, 5, 8, 10)
             gridBagConstraints.insets = Insets(2, 2, 2, 2)
 
             add(Spacer().apply { preferredSize = Dimension(50, 50) })
@@ -89,24 +89,31 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
             add(Box.createHorizontalStrut(300))
             add(hostTextField.apply {
                 name = "hostTextField"
-                minimumSize = Dimension(300, 30)
-                preferredSize = Dimension(300, 30)
                 addKeyListener(AddKeyListener())
             }, createGbc(1, 0).apply {
+                weightx = 0.95
                 fill = GridBagConstraints.HORIZONTAL
             })
 
             // Port
-            add(portLabel.apply {
-                text = "Port: "
-                preferredSize = Dimension(50, 30)
-            }, createGbc(2, 0))
-            add(portTextField.apply {
-                name = "portTextField"
-                minimumSize = Dimension(100, 30)
-                preferredSize = Dimension(100, 30)
-                addKeyListener(AddKeyListener())
-            }, createGbc(3, 0))
+            add(JPanel().apply {
+                layout = GridBagLayout()
+                add(portLabel.apply {
+                    text = "Port: "
+                }, createGbc(0, 0))
+                add(portTextField.apply {
+                    name = "portTextField"
+                    minimumSize = Dimension(100, 30)
+                    preferredSize = Dimension(100, 30)
+                    addKeyListener(AddKeyListener())
+                }, createGbc(1, 0).apply {
+                    anchor = GridBagConstraints.LINE_START
+                })
+            }, createGbc(3, 0).apply {
+                insets = Insets(0, 10, 0, 0)
+                weightx = 0.05
+                anchor = GridBagConstraints.LINE_START
+            })
 
             // Authentication
             add(authenticationLabel.apply {
@@ -166,10 +173,8 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
             }, createGbc(0, 5))
             add(urlTextField.apply {
                 name = "urlTextField"
-                minimumSize = Dimension(300, 30)
-                preferredSize = Dimension(300, 30)
                 addKeyListener(AddKeyListener())
-            }, createGbc(1, 5))
+            }, createGbc(1, 5, width = 3, fill = GridBagConstraints.HORIZONTAL))
 
             add(urlHelpTextLabel.apply {
                 text = "Overrides settings above"
@@ -220,8 +225,8 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                 if (currentUrl == null) {
                     currentUrl = buildUrl("http://localhost:9200")
                 }
-                val newUrl = URIBuilder(currentUrl)
-                newUrl.apply {
+                val newUrl = URIBuilder().apply {
+                    scheme = currentUrl!!.scheme
                     host = hostTextField.text.trim()
                     if (!portTextField.text.isNullOrEmpty()) {
                         port = Integer.valueOf(portTextField.text) ?: -1
@@ -276,19 +281,21 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
 
     private fun createGbc(
         x: Int, y: Int, width: Int = 1, height: Int = 1,
+        fill: Int? = null,
+        insets: Insets? = null,
         isLastElement: Boolean = false
     ): GridBagConstraints {
         val westInsects = Insets(5, 0, 5, 5)
         return GridBagConstraints().apply {
-            gridx = x
-            gridy = y
-            gridwidth = width
-            gridheight = if (isLastElement) 10 else height
-            anchor = if (x == 0) GridBagConstraints.WEST else GridBagConstraints.LINE_START
-            fill = if (x == 0) GridBagConstraints.BOTH else GridBagConstraints.REMAINDER
-            insets = westInsects
-            weightx = if (x == 0 || x == 2) 0.1 else 1.0
-            weighty = if (isLastElement) 1.0 else 0.0
+            this.gridx = x
+            this.gridy = y
+            this.gridwidth = width
+            this.gridheight = if (isLastElement) 10 else height
+            this.anchor = if (x == 0) GridBagConstraints.WEST else GridBagConstraints.LINE_START
+            this.fill = fill ?: if (x == 0) GridBagConstraints.BOTH else GridBagConstraints.REMAINDER
+            this.insets = insets ?: westInsects
+            this.weightx = if (x == 0 || x == 2) 0.1 else 1.0
+            this.weighty = if (isLastElement) 1.0 else 0.0
         }
     }
 

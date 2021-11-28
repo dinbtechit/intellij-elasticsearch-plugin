@@ -31,7 +31,7 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
     private val emptyPanel = EmptyPanel()
     private val leftMenuPanel = LeftMenuPanel(controller)
     private val rightPanel = RightContentPanel(controller)
-    private var applyAction: Action? = null
+    private var applyAction: ApplyAction = ApplyAction()
 
     init {
         title = "New Elasticsearch Connections"
@@ -68,8 +68,8 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
         }
         val rootDialogPanel = panel { }.apply {
             layout = BorderLayout(0, 0)
-            preferredSize = Dimension(850, 650)
-            minimumSize = Dimension(850, 650)
+            preferredSize = Dimension(950, 650)
+            minimumSize = Dimension(950, 650)
             add(oneSplitter, BorderLayout.CENTER)
             border = MatteBorder(0, 0, 1, 0, Color.decode("#2F3233"))
         }
@@ -111,11 +111,13 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
     }
 
     override fun createActions(): Array<Action> {
-        applyAction = ApplyAction()
-        return super.createActions().plus(applyAction!!)
+        return super.createActions().plus(applyAction)
     }
 
     private inner class ApplyAction : DialogWrapperAction("Apply") {
+        init {
+            isEnabled = false;
+        }
         override fun doAction(e: ActionEvent?) {
             doApplyAction(e!!)
         }
