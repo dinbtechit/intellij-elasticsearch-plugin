@@ -42,6 +42,7 @@ class LeftMenuPanel(
 
     init {
         initUIComponents()
+        connectionListModel.elements().toList()
         subscribeToListeners()
     }
 
@@ -104,6 +105,7 @@ class LeftMenuPanel(
 
     override fun getData(dataId: String): Any? {
         super.getData(dataId)
+        controller.toggleApplyButton(connectionListModel.elements().toList())
         if (DialogModelController.DataKey.ES_CONNECTIONS.name == dataId) {
             return connectionListModel
         } else if (DialogModelController.DataKey.SELECTED_CONNECTION.name == dataId) {
@@ -132,7 +134,7 @@ class LeftMenuPanel(
         if (it.newValue is ConnectionInfo) {
             val newValue = it.newValue as ConnectionInfo
             val index = connectionListModel.indexOf(newValue)
-            if (index >= 0 ) {
+            if (index >= 0) {
                 connectionListModel.get(index).apply {
                     name = newValue.name
                     hostname = newValue.hostname

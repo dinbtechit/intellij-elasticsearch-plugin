@@ -87,16 +87,32 @@ data class ConnectionInfo(
     var username: String = "",
     var password: CharArray? = null
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as ConnectionInfo
-        if (uuid != other.uuid) return false
-        return true
-    }
+
 
     override fun hashCode(): Int {
         return uuid.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ConnectionInfo
+
+        if (name != other.name) return false
+        if (uuid != other.uuid) return false
+        if (url != other.url) return false
+        if (protocol != other.protocol) return false
+        if (hostname != other.hostname) return false
+        if (port != other.port) return false
+        if (authenticationType != other.authenticationType) return false
+        if (username != other.username) return false
+        if (password != null) {
+            if (other.password == null) return false
+            if (!password.contentEquals(other.password)) return false
+        } else if (other.password != null) return false
+
+        return true
     }
 }
 

@@ -1,5 +1,6 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view
 
+import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.LeftMenuPanel
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.rightcontent.RightContentPanel
@@ -51,7 +52,7 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
     }
 
     internal fun doApplyAction(e: ActionEvent) {
-        if (applyAction!!.isEnabled) {
+        if (applyAction.isEnabled) {
             controller.saveConnectionChanges()
         }
     }
@@ -81,7 +82,8 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
         // Subscribe To List Selection Events
         controller.addPropertyChangeListener {
             if (it.propertyName == DialogModelController.EventType.UNSELECTED.name
-                || it.propertyName == DialogModelController.EventType.SELECTED.name) {
+                || it.propertyName == DialogModelController.EventType.SELECTED.name
+            ) {
                 if (it.newValue is Int && it.newValue == -1) {
                     oneSplitter.secondComponent = emptyPanel
                     emptyPanel.revalidate()
@@ -93,7 +95,14 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
                     rightPanel.repaint()
                     rightPanel.isVisible = true
                 }
+            } else if (it.propertyName == DialogModelController.EventType.ENABLE_APPLY_ACTION.name) {
+                if (it.newValue is MutableList<*>) {
+                    applyAction.isEnabled = true
+                }
+            } else if (it.propertyName == DialogModelController.EventType.DISABLE_APPLY_ACTION.name) {
+                applyAction.isEnabled = false
             }
+
         }
     }
 
@@ -116,8 +125,9 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
     private inner class ApplyAction : DialogWrapperAction("Apply") {
         init {
-            isEnabled = false;
+            isEnabled = false
         }
+
         override fun doAction(e: ActionEvent?) {
             doApplyAction(e!!)
         }

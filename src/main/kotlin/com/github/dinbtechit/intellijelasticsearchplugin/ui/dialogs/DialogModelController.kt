@@ -6,6 +6,7 @@ import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticS
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.getAllConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.shared.ProjectUtils
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.Constants.CREDS_SERVICE_NAME
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.LeftMenuPanel
 import com.intellij.credentialStore.Credentials
 import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.openapi.application.ApplicationManager
@@ -27,6 +28,7 @@ class DialogModelController {
         ADD_CONNECTION,
         DELETE_CONNECTION,
         ENABLE_APPLY_ACTION,
+        DISABLE_APPLY_ACTION,
         DUPLICATE,
         SAVE,
         NAME_CHANGE,
@@ -47,6 +49,7 @@ class DialogModelController {
     private val config = ElasticSearchConfig.getInstance(ProjectUtils().currentProject())
 
     private var connectionInfo: ConnectionInfo = ConnectionInfo()
+    private var previousCollectionInfos = config.getAllConnectionInfo()
     private var pcs: SwingPropertyChangeSupport = SwingPropertyChangeSupport(this)
 
     fun addPropertyChangeListener(l: PropertyChangeListener?) {
@@ -106,6 +109,7 @@ class DialogModelController {
 
     fun saveConnectionChanges() {
         pcs.firePropertyChange(EventType.SAVE.name, 1, -1)
+        previousCollectionInfos = config.getAllConnectionInfo()
         ApplicationManager.getApplication().saveAll()
     }
 
@@ -115,5 +119,10 @@ class DialogModelController {
 
     fun updateConnectionInfo(connectionInfo: ConnectionInfo) {
         pcs.firePropertyChange(EventType.UPDATE_CONNECTION_INFO.name, -1, connectionInfo)
+    }
+
+    fun toggleApplyButton(newConnectionInfo: List<ConnectionInfo>) {
+        pcs.firePropertyChange(EventType.DISABLE_APPLY_ACTION.name, false, true)
+        pcs.firePropertyChange(EventType.ENABLE_APPLY_ACTION.name, previousCollectionInfos, newConnectionInfo)
     }
 }
