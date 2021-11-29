@@ -1,12 +1,12 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.ui.toolwindow
 
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction
+import com.github.dinbtechit.intellijelasticsearchplugin.actions.*
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.actionSystem.ShortcutSet
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -19,7 +19,9 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import java.awt.Insets
+import java.awt.event.KeyEvent
 import javax.swing.JPanel
+import javax.swing.KeyStroke
 import javax.swing.ScrollPaneConstants
 
 
@@ -54,6 +56,12 @@ class ToolWindowContents(
         val refreshAction = manager.getAction(RefreshAction.ID)
         val duplicateAction = manager.getAction(DuplicateAction.ID)
         val viewPropertiesAction = manager.getAction(ViewPropertiesAction.ID)
+        val collapseTreeAction = CollapseAction(AllIcons.Actions.Collapseall).apply {
+            this.registerCustomShortcutSet(this.shortcutSet, toolWindow.component)
+        }
+        val expandTreeAction = ExpandAction(AllIcons.Actions.Expandall).apply {
+            this.registerCustomShortcutSet(this.shortcutSet, toolWindow.component)
+        }
 
         toolbar.apply {
             add(newAction)
@@ -61,6 +69,9 @@ class ToolWindowContents(
             addSeparator()
             add(refreshAction)
             add(viewPropertiesAction)
+            addSeparator()
+            add(collapseTreeAction)
+            add(expandTreeAction)
         }
         return toolbar
     }

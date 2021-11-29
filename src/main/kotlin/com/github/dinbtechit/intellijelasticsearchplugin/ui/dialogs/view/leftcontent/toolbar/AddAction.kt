@@ -1,4 +1,4 @@
-package com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog
+package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.toolbar
 
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController

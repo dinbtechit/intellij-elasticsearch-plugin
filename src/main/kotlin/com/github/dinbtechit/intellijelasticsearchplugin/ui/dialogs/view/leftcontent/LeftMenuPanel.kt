@@ -1,9 +1,9 @@
 package com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent
 
 import com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.AddAction
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DeleteAction
-import com.github.dinbtechit.intellijelasticsearchplugin.actions.newdialog.DuplicateAction
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.toolbar.AddAction
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.toolbar.DeleteAction
+import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.view.leftcontent.toolbar.DuplicateAction
 import com.github.dinbtechit.intellijelasticsearchplugin.services.state.ConnectionInfo
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.DialogModelController.EventType
