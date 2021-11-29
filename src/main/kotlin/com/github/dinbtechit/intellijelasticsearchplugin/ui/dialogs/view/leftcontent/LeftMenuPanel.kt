@@ -35,7 +35,7 @@ class LeftMenuPanel(
     private val connectionListModel = DefaultListModel<ConnectionInfo>().apply {
         addAll(controller.getAllConnectionInfos())
     }
-    val connectionsListField: JBList<ConnectionInfo> = JBList(connectionListModel).apply {
+    private val connectionsListField: JBList<ConnectionInfo> = JBList(connectionListModel).apply {
         selectedIndex = 0
     }
 

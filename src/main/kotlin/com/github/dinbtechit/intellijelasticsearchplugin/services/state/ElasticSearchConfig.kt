@@ -2,23 +2,31 @@ package com.github.dinbtechit.intellijelasticsearchplugin.services.state
 
 import com.github.dinbtechit.intellijelasticsearchplugin.ui.dialogs.Constants
 import com.intellij.ide.passwordSafe.PasswordSafe
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.*
+import com.intellij.openapi.options.advanced.AdvancedSettingsChangeListener
 import com.intellij.openapi.project.Project
+import com.intellij.platform.WebProjectGenerator
 import com.intellij.remoteServer.util.CloudConfigurationUtil
+import com.intellij.util.EventDispatcher
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
+import com.intellij.xdebugger.impl.settings.XDebuggerSettingManagerImpl
 import java.util.*
 
-@State(
-    name = "org.github.dinbtechit.ElasticSearchConfig",
-    storages = [Storage("elasticsearch.config.xml", roamingType = RoamingType.PER_OS)]
-)
+@State(name = "org.github.dinbtechit.ElasticSearchConfig", storages = [Storage("elasticsearch.config.xml")])
 class ElasticSearchConfig : PersistentStateComponent<ElasticSearchConfig> {
 
+    private val changeEventDispatcher = EventDispatcher.create(SettingsChangedListener::class.java)
+
     @XCollection(propertyElementName = "connections")
-    var connections = mutableListOf<ConnectionInfoState>()
+    var connections: MutableList<ConnectionInfoState> = mutableListOf()
+        set(value) {
+            field = value
+            changeEventDispatcher.multicaster.settingsChanged()
+        }
 
     companion object {
         @JvmStatic
@@ -30,7 +38,15 @@ class ElasticSearchConfig : PersistentStateComponent<ElasticSearchConfig> {
     override fun getState(): ElasticSearchConfig = this
 
     override fun loadState(state: ElasticSearchConfig) = XmlSerializerUtil.copyBean(state, this)
+
+    fun addChangesListener(listener: SettingsChangedListener, disposable: Disposable) =
+        changeEventDispatcher.addListener(listener, disposable)
+
+    interface SettingsChangedListener : EventListener {
+        fun settingsChanged()
+    }
 }
+
 
 fun ElasticSearchConfig.getAllConnectionInfo(): MutableList<ConnectionInfo> {
     val connectionInfos = mutableListOf<ConnectionInfo>()

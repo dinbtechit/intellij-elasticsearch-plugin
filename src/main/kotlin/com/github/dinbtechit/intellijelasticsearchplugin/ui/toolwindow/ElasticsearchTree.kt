@@ -19,7 +19,7 @@ import javax.swing.JTree
 
 class ElasticsearchTree : Tree(), DumbAware {
 
-    var treeSpeedSearch: TreeSpeedSearch
+    private var treeSpeedSearch: TreeSpeedSearch
 
     init {
         val config = ElasticSearchConfig.getInstance(ProjectUtils().currentProject())
@@ -37,10 +37,17 @@ class ElasticsearchTree : Tree(), DumbAware {
                 else -> "<empty>"
             }
         }, true)
+        config.addChangesListener(SettingsChanged()) {}
     }
 
+    inner class SettingsChanged : ElasticSearchConfig.SettingsChangedListener {
+        override fun settingsChanged() {
+            val config = ElasticSearchConfig.getInstance(ProjectUtils().currentProject())
+            model = ElasticsearchTreeModel(config.getAllConnectionInfo())
+        }
+    }
 
-    internal class ElasticsearchTreeCellRenderer : ColoredTreeCellRenderer() {
+    private class ElasticsearchTreeCellRenderer : ColoredTreeCellRenderer() {
         override fun customizeCellRenderer(
             tree: JTree,
             value: Any?,
