@@ -1,6 +1,6 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin url="https://github.com/dinbtechit/intellij-elasticsearch-plugin">
-    <id>com.github.dinbtechit.intellijelasticsearchplugin</id>
+    <id>com.github.dinbtechit.es</id>
     <name>Elasticsearch</name>
     <vendor>dinbtechit</vendor>
 
@@ -8,13 +8,13 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
-                serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyApplicationService"/>
+                serviceImplementation="com.github.dinbtechit.es.services.MyApplicationService"/>
         <projectService
-                serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.state.ElasticSearchConfig"/>
+                serviceImplementation="com.github.dinbtechit.es.services.state.ElasticSearchConfig"/>
         <projectService
-                serviceImplementation="com.github.dinbtechit.intellijelasticsearchplugin.services.MyProjectService"/>
+                serviceImplementation="com.github.dinbtechit.es.services.MyProjectService"/>
         <toolWindow
-                factoryClass="com.github.dinbtechit.intellijelasticsearchplugin.ui.toolwindow.ElasticsearchToolWindow"
+                factoryClass="com.github.dinbtechit.es.ui.toolwindow.ElasticsearchToolWindow"
                 icon="ElasticsearchIcons.logo"
                 anchor="right"
                 secondary="true"
@@ -25,29 +25,29 @@
     </extensions>
 
     <actions>
-        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction"
-                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.NewAction"
+        <action id="com.github.dinbtechit.es.actions.NewAction"
+                class="com.github.dinbtechit.es.actions.NewAction"
                 icon="AllIcons.General.Add"
                 text="Elasticsearch: New Connection">
             <override-text place="ToolwindowContent" text="New Connection"/>
         </action>
 
-        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction"
-                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.DuplicateAction"
+        <action id="com.github.dinbtechit.es.actions.DuplicateAction"
+                class="com.github.dinbtechit.es.actions.DuplicateAction"
                 icon="AllIcons.Actions.Copy"
                 text="Elasticsearch: Duplicate">
             <override-text place="ToolwindowContent" text="Duplicate"/>
         </action>
 
-        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction"
-                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.RefreshAction"
+        <action id="com.github.dinbtechit.es.actions.RefreshAction"
+                class="com.github.dinbtechit.es.actions.RefreshAction"
                 icon="AllIcons.Actions.Refresh"
                 text="Elasticsearch: Refresh">
             <override-text place="ToolwindowTitle" text="Refresh"/>
         </action>
 
-        <action id="com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction"
-                class="com.github.dinbtechit.intellijelasticsearchplugin.actions.ViewPropertiesAction"
+        <action id="com.github.dinbtechit.es.actions.ViewPropertiesAction"
+                class="com.github.dinbtechit.es.actions.ViewPropertiesAction"
                 icon="AllIcons.General.Settings"
                 text="Elasticsearch: View Properties">
             <override-text place="ToolwindowContent" text="View Properties"/>
@@ -55,7 +55,7 @@
     </actions>
 
     <applicationListeners>
-        <listener class="com.github.dinbtechit.intellijelasticsearchplugin.listeners.MyProjectManagerListener"
+        <listener class="com.github.dinbtechit.es.listeners.MyProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
 </idea-plugin>
