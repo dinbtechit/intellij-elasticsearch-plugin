@@ -61,9 +61,8 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                             this.passwordField.text = ""
                             this.passwordField.setPasswordIsStored(false)
                         }
-                        this.authTypeComboBox.selectedIndex = newValue.authenticationType
                         this.urlTextField.text = newValue.url
-
+                        this.authTypeComboBox.selectedIndex = newValue.authenticationType
                     }
                 }
             }
@@ -263,7 +262,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                 }
                 authenticationType = authTypeComboBox.selectedIndex
                 username = userTextField.text
-                password = passwordField.password
+                password = if (passwordField.password.size > 0) passwordField.password else null
                 url = urlTextField.text
             }
         )
