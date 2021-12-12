@@ -42,7 +42,6 @@ class LeftMenuPanel(
 
     init {
         initUIComponents()
-        connectionListModel.elements().toList()
         subscribeToListeners()
     }
 
@@ -210,6 +209,7 @@ class LeftMenuPanel(
                 }
             }
         }
+        controller.populateConfigurationFields(connectionsListField.selectedValue)
     }
 
     private fun unselectConnection() {

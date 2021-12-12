@@ -19,7 +19,6 @@ object Constants {
 }
 
 class DialogModelController {
-
     enum class EventType {
         SELECTED,
         UNSELECTED,
@@ -30,6 +29,7 @@ class DialogModelController {
         DUPLICATE,
         SAVE,
         NAME_CHANGE,
+        POPULATE_CONFIGURATION,
         UPDATE_CONNECTION_INFO
     }
 
@@ -70,12 +70,12 @@ class DialogModelController {
             val newConnectionInfoState = ConnectionInfoState()
             newConnectionInfoState.apply {
                 uuid = conn.uuid
-                name = conn.name
-                hostname = conn.hostname
+                name = conn.name.trim()
+                hostname = conn.hostname.trim()
                 port = conn.port
                 authenticationType = conn.authenticationType
                 username = conn.username
-                url = conn.url
+                url = conn.url.trim()
             }
             connectionInfoState.add(newConnectionInfoState)
 
@@ -103,6 +103,10 @@ class DialogModelController {
     fun unselectCollectionInfo() {
         val oldValue = connectionInfo
         pcs.firePropertyChange(EventType.UNSELECTED.name, oldValue, -1)
+    }
+
+    fun populateConfigurationFields(connectionInfo: ConnectionInfo) {
+        pcs.firePropertyChange(EventType.POPULATE_CONFIGURATION.name, -1, connectionInfo)
     }
 
     fun saveConnectionChanges() {

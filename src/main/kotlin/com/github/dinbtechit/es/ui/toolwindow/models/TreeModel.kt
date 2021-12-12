@@ -83,10 +83,8 @@ class ElasticsearchTreeNode<T>(
     val childData: List<T>? = null
 ) : DefaultMutableTreeNode() {
     init {
-        if (childIcon != null) {
-            if (childData != null && childData.isNotEmpty()) {
-                for (d in childData) add(ElasticsearchTreeNode(childIcon, d))
-            }
+        if (childIcon != null && childData != null && childData.isNotEmpty()) {
+            for (d in childData) add(ElasticsearchTreeNode(childIcon, d))
         }
     }
 

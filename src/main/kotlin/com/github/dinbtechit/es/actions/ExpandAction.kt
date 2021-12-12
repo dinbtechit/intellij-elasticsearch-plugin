@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent
 import javax.swing.Icon
 import javax.swing.KeyStroke
 
-class ExpandAction(icon: Icon) : AnAction("Expand", "Expand Elasticsearch", icon) {
+class ExpandAction(icon: Icon) : AnAction("Expand", "Expand elasticsearch", icon) {
 
     init {
         shortcutSet = ShortcutSet {

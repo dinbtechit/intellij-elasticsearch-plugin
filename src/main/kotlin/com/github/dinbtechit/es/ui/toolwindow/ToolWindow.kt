@@ -1,6 +1,7 @@
 package com.github.dinbtechit.es.ui.toolwindow
 
 import com.github.dinbtechit.es.actions.*
+import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
@@ -34,6 +35,26 @@ class ToolWindowContents(
     project: Project
 ) : SimpleToolWindowPanel(true, true), Disposable {
 
+    private val controller = TreeModelController()
+
+    // Fields
+    private val esTree = ElasticsearchTree()
+
+    // Actions
+    private val defaultActionGroup = DefaultActionGroup()
+    private val manager = ActionManager.getInstance()
+    private val newAction = manager.getAction(NewAction.ID)
+    private val refreshAction = manager.getAction(RefreshAction.ID)
+    private val duplicateAction = manager.getAction(DuplicateAction.ID)
+    private val viewPropertiesAction = manager.getAction(ViewPropertiesAction.ID)
+    private val collapseTreeAction = CollapseAction(AllIcons.Actions.Collapseall).apply {
+        this.registerCustomShortcutSet(this.shortcutSet, toolWindow.component)
+    }
+    private val expandTreeAction = ExpandAction(AllIcons.Actions.Expandall).apply {
+        this.registerCustomShortcutSet(this.shortcutSet, toolWindow.component)
+    }
+
+
     init {
         val content = ContentFactory.SERVICE.getInstance().createContent(this, "", false)
         toolWindow.contentManager.addContent(content)
@@ -43,23 +64,11 @@ class ToolWindowContents(
         actionToolbar.setTargetComponent(this)
         toolbar = actionToolbar.component
         setContent(getContentPanel())
+        subscribeToEvents()
     }
 
     private fun buildToolBar(): DefaultActionGroup {
-        val toolbar = DefaultActionGroup()
-        val manager = ActionManager.getInstance()
-        val newAction = manager.getAction(NewAction.ID)
-        val refreshAction = manager.getAction(RefreshAction.ID)
-        val duplicateAction = manager.getAction(DuplicateAction.ID)
-        val viewPropertiesAction = manager.getAction(ViewPropertiesAction.ID)
-        val collapseTreeAction = CollapseAction(AllIcons.Actions.Collapseall).apply {
-            this.registerCustomShortcutSet(this.shortcutSet, toolWindow.component)
-        }
-        val expandTreeAction = ExpandAction(AllIcons.Actions.Expandall).apply {
-            this.registerCustomShortcutSet(this.shortcutSet, toolWindow.component)
-        }
-
-        toolbar.apply {
+        defaultActionGroup.apply {
             add(newAction)
             add(duplicateAction)
             addSeparator()
@@ -69,7 +78,7 @@ class ToolWindowContents(
             add(collapseTreeAction)
             add(expandTreeAction)
         }
-        return toolbar
+        return defaultActionGroup
     }
 
     private fun getContentPanel(): JPanel {
@@ -84,7 +93,6 @@ class ToolWindowContents(
             )
         )
 
-        val esTree = ElasticsearchTree()
         val jbScrollPane = JBScrollPane(
             esTree,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -95,6 +103,28 @@ class ToolWindowContents(
             fill = GridConstraints.FILL_BOTH
         })
         return panel
+    }
+
+    private fun subscribeToEvents() {
+        controller.subscribe {
+            if (it.propertyName == TreeModelController.EventType.TREE_NODE_SELECTED.name) {
+                ViewPropertiesAction.ENABLED = true
+            } else if (it.propertyName == TreeModelController.EventType.TREE_NODE_UNSELECTED.name) {
+                ViewPropertiesAction.ENABLED = false
+            }
+        }
+        // Tree Selection Events
+        esTree.addTreeSelectionListener {
+            controller.selectedTree(it)
+        }
+    }
+
+    override fun getData(dataId: String): Any? {
+        super.getData(dataId)
+        if (TreeDataKey.TREE_MODEL.name == dataId) {
+            return esTree
+        }
+        return null
     }
 
     override fun dispose() {

@@ -1,5 +1,6 @@
 package com.github.dinbtechit.es.actions
 
+import com.github.dinbtechit.es.ui.dialogs.model.DialogViewType
 import com.github.dinbtechit.es.ui.dialogs.view.NewConnectionDialog
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -10,7 +11,7 @@ class NewAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        if (NewConnectionDialog(e.project!!).showAndGet()) {
+        if (NewConnectionDialog(DialogViewType.NEW, project = e.project!!).showAndGet()) {
             println("New Clicked")
         }
 

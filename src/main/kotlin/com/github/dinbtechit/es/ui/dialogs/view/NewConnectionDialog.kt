@@ -1,6 +1,8 @@
 package com.github.dinbtechit.es.ui.dialogs.view
 
+import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
+import com.github.dinbtechit.es.ui.dialogs.model.DialogViewType
 import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.LeftMenuPanel
 import com.github.dinbtechit.es.ui.dialogs.view.rightcontent.RightContentPanel
 import com.intellij.openapi.project.Project
@@ -21,7 +23,10 @@ import javax.swing.border.Border
 import javax.swing.border.MatteBorder
 
 
-class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
+class NewConnectionDialog(
+    viewType: DialogViewType = DialogViewType.VIEW_PROPERTIES,
+    private val selectedConnectionInfo: ConnectionInfo? = null,
+    project: Project) : DialogWrapper(true) {
 
 
     private var controller = DialogModelController()
@@ -29,12 +34,12 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
 
     // Components
     private val emptyPanel = EmptyPanel()
-    private val leftMenuPanel = LeftMenuPanel(controller)
-    private val rightPanel = RightContentPanel(controller)
+    private val leftMenuPanel = LeftMenuPanel(controller = controller)
+    private val rightPanel = RightContentPanel(viewType, controller = controller)
     private var applyAction: ApplyAction = ApplyAction()
 
     init {
-        title = "New Elasticsearch Connections"
+        title = "Elasticsearch Connections"
         init()
         subscribeToListeners()
     }
@@ -73,6 +78,10 @@ class NewConnectionDialog(private val project: Project) : DialogWrapper(true) {
             add(oneSplitter, BorderLayout.CENTER)
             border = MatteBorder(0, 0, 1, 0, Color.decode("#2F3233"))
         }
+
+        if (selectedConnectionInfo != null) {
+            controller.selectConnectionInfo(selectedConnectionInfo)
+        } else controller.selectConnectionInfo(0)
 
         return rootDialogPanel
     }

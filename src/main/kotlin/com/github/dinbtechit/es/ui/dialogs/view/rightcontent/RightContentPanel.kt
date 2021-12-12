@@ -2,6 +2,7 @@ package com.github.dinbtechit.es.ui.dialogs.view.rightcontent
 
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
+import com.github.dinbtechit.es.ui.dialogs.model.DialogViewType
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.*
@@ -10,7 +11,9 @@ import java.awt.event.KeyEvent
 import javax.swing.*
 import javax.swing.border.MatteBorder
 
-class RightContentPanel(private val controller: DialogModelController) : JPanel() {
+class RightContentPanel(
+    viewType: DialogViewType,
+    private val controller: DialogModelController) : JPanel() {
 
     // Fields
     private val nameTextField: JTextField = JTextField()
@@ -27,14 +30,10 @@ class RightContentPanel(private val controller: DialogModelController) : JPanel(
     init {
         layout = BorderLayout(0, 0)
         initUIComponents()
-        controller.addPropertyChangeListener {
-            if (it.newValue is ConnectionInfo) {
-                val newValue = it.newValue as ConnectionInfo
-                nameTextField.text = newValue.name
-            }
+        subscribeToEvents();
+        if (viewType == DialogViewType.NEW) {
+            controller.addConnection()
         }
-        controller.addConnection()
-        controller.selectConnectionInfo(0)
     }
 
     private fun initUIComponents() {
@@ -110,5 +109,15 @@ class RightContentPanel(private val controller: DialogModelController) : JPanel(
             border = MatteBorder(1, 0, 1, 0, Color.decode("#2F3233"))
         }
         add(bottomPanel, BorderLayout.SOUTH)
+    }
+
+    private fun subscribeToEvents() {
+        controller.addPropertyChangeListener {
+            if (it.newValue is ConnectionInfo) {
+                val newValue = it.newValue as ConnectionInfo
+                nameTextField.text = newValue.name
+                nameTextField.repaint()
+            }
+        }
     }
 }

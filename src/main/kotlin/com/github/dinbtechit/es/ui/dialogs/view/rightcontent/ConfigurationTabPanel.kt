@@ -26,6 +26,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
     private val portTextField = JTextField()
     private val authenticationLabel = JLabel()
     private val authTypeComboBox = ComboBox<String>(arrayOf("User & Password", "No Auth"))
+    private val showPasswordCheckBox = JBCheckBox("Show password")
     private val userLabel = JLabel()
     private val userTextField = JTextField()
     private val passwordLabel = JLabel()
@@ -47,7 +48,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
         initUIComponents()
         controller.addPropertyChangeListener {
             when (it.propertyName) {
-                DialogModelController.EventType.SELECTED.name -> {
+                DialogModelController.EventType.POPULATE_CONFIGURATION.name -> {
                     if (it.newValue is ConnectionInfo) {
                         val newValue = it.newValue as ConnectionInfo
                         connectionInfo = newValue
@@ -154,7 +155,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                 preferredSize = Dimension(300, 30)
                 addKeyListener(AddKeyListener())
             }, createGbc(1, 3))
-            add(JBCheckBox("Show password").apply {
+            add(showPasswordCheckBox.apply {
                 val checkbox = this
                 addActionListener {
                     if (checkbox.isSelected) {
@@ -217,9 +218,10 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                     path = url.path.trim()
                 }.build()
 
-                try {
-                    currentUrl = buildUrl(urlTextField.text)
+                currentUrl = try {
+                    buildUrl(urlTextField.text)
                 } catch (e: MalformedURLException) {
+                    null
                 }
                 if (currentUrl == null) {
                     currentUrl = buildUrl("http://localhost:9200")
@@ -273,9 +275,11 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
         userTextField.isVisible = isVisible
         passwordLabel.isVisible = isVisible
         passwordField.isVisible = isVisible
-        updateConnectionInfo()
+        showPasswordCheckBox.isVisible = isVisible
         userTextField.repaint()
         passwordField.repaint()
+        showPasswordCheckBox.repaint()
+        updateConnectionInfo()
     }
 
     private fun createGbc(

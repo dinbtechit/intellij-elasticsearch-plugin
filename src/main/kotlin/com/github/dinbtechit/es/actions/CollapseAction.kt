@@ -5,7 +5,7 @@ import java.awt.event.KeyEvent
 import javax.swing.Icon
 import javax.swing.KeyStroke
 
-class CollapseAction(icon: Icon) : AnAction("Collapse", "Collapse Elasticsearch", icon) {
+class CollapseAction(icon: Icon) : AnAction("Collapse", "Collapse elasticsearch", icon) {
 
     init {
         shortcutSet = ShortcutSet {

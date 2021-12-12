@@ -9,7 +9,7 @@ import javax.swing.DefaultListModel
 import javax.swing.Icon
 
 class DuplicateAction(
-    private val icon: Icon,
+    icon: Icon,
     private val controller: DialogModelController
 ) : AnAction(icon) {
     companion object {
@@ -37,7 +37,7 @@ class DuplicateAction(
             )
         }
         for (conn in listOfConnections) {
-            if (conn.name == originalName) {
+            if (conn.name.trim() == originalName) {
                 count++
                 selectedIndex = allConnections.indexOf(conn)
                 originalName = "${nameRegex.replace(originalName, "").trim()} $count"
