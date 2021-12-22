@@ -2,6 +2,7 @@ package com.github.dinbtechit.es.ui.dialogs.view.rightcontent
 
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
+import com.github.dinbtechit.es.ui.shared.textfield.LengthRestrictedDocument
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBPasswordField
@@ -23,7 +24,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
     private val hostLabel = JLabel()
     private val hostTextField = JTextField()
     private val portLabel = JLabel()
-    private val portTextField = JTextField()
+    private val portTextField = JTextField(9)
     private val authenticationLabel = JLabel()
     private val authTypeComboBox = ComboBox<String>(arrayOf("User & Password", "No Auth"))
     private val showPasswordCheckBox = JBCheckBox("Show password")
@@ -105,6 +106,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                     name = "portTextField"
                     minimumSize = Dimension(100, 30)
                     preferredSize = Dimension(100, 30)
+                    document = LengthRestrictedDocument(9)
                     addKeyListener(AddKeyListener())
                 }, createGbc(1, 0).apply {
                     anchor = GridBagConstraints.LINE_START
