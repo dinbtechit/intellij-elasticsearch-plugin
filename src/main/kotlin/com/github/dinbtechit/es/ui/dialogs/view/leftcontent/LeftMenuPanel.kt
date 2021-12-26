@@ -1,12 +1,12 @@
 package com.github.dinbtechit.es.ui.dialogs.view.leftcontent
 
 import com.github.dinbtechit.es.actions.RefreshAction
-import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.AddAction
-import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.DeleteAction
-import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.DuplicateAction
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController.EventType
+import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.AddAction
+import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.DeleteAction
+import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.DuplicateAction
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -15,9 +15,9 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.ui.ColoredListCellRenderer
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.ui.UIUtil
 import icons.ElasticsearchIcons
 import java.awt.BorderLayout
-import java.awt.Color
 import java.beans.PropertyChangeEvent
 import javax.swing.*
 import javax.swing.border.EmptyBorder
@@ -46,7 +46,7 @@ class LeftMenuPanel(
     }
 
     companion object {
-        val backgroundColor = Color.decode("#2F3233")
+        val backgroundColor = UIUtil.SIDE_PANEL_BACKGROUND
     }
 
     private fun initUIComponents() {
@@ -54,7 +54,7 @@ class LeftMenuPanel(
         // ToolBar
         val group = DefaultActionGroup()
         val manager = ActionManager.getInstance()
-        val refreshAction = manager.getAction(RefreshAction.ID)
+        val refreshAction = RefreshAction()
 
         group.apply {
             add(addAction)

@@ -1,9 +1,12 @@
-package com.github.dinbtechit.es.ui.toolwindow
+package com.github.dinbtechit.es.ui.toolwindow.service
 
+import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
+import com.intellij.openapi.components.Service
 import java.beans.PropertyChangeListener
 import javax.swing.event.SwingPropertyChangeSupport
 import javax.swing.event.TreeSelectionEvent
 
+@Service
 class TreeModelController {
 
     private var pcs: SwingPropertyChangeSupport = SwingPropertyChangeSupport(this)
@@ -29,9 +32,4 @@ class TreeModelController {
             }
         }
     }
-
-
-
-
-
 }

@@ -1,0 +1,25 @@
+package com.github.dinbtechit.es.actions.popup
+
+import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
+import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchConnectionTreeNode
+import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+
+class ConnectAction : AnAction(
+    "Connect", "Connect elasticsearch connection", AllIcons.Actions.Execute
+) {
+
+    override fun actionPerformed(e: AnActionEvent) {
+        val treeModel = e.getData(TreeDataKey.TREE_MODEL) as ElasticsearchTree
+        if (!treeModel!!.isSelectionEmpty
+            && treeModel.selectionPaths[0].lastPathComponent is ElasticsearchConnectionTreeNode
+        ) {
+            val connectionTreeNode = treeModel.selectionPaths[0].lastPathComponent as ElasticsearchConnectionTreeNode
+            connectionTreeNode.connect()
+        }
+
+    }
+
+}

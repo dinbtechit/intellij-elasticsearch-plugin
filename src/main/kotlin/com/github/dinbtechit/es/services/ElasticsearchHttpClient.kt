@@ -4,11 +4,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 
-class ElasticsearchHttpClient: OkHttpClient() {
+class ElasticsearchHttpClient<R, S>: OkHttpClient() {
 
-    suspend fun run() {
+    fun run() {
         val request = Request.Builder()
-            .url("http://sportsrpt-dinesh.int.spsc-np.cloud.gracenote.com:9200/_cat/indices")
+            .url("http://sportsrpt-dinesh.int.spsc-np.cloud.gracenote.com:9200/_cat/indices?format=json&pretty")
             .build()
 
         this.newCall(request).execute().use { response ->

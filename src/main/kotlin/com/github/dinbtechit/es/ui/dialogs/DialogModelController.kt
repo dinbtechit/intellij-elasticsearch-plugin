@@ -4,7 +4,7 @@ import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.services.state.ConnectionInfoState
 import com.github.dinbtechit.es.services.state.ElasticSearchConfig
 import com.github.dinbtechit.es.services.state.getAllConnectionInfo
-import com.github.dinbtechit.es.shared.ProjectUtils
+import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.dialogs.Constants.CREDS_SERVICE_NAME
 import com.intellij.credentialStore.Credentials
 import com.intellij.ide.passwordSafe.PasswordSafe
@@ -44,7 +44,7 @@ class DialogModelController {
         }
     }
 
-    private val config = ElasticSearchConfig.getInstance(ProjectUtils().currentProject())
+    private val config = ElasticSearchConfig.getInstance(ProjectUtil.currentProject())
 
     private var connectionInfo: ConnectionInfo = ConnectionInfo()
     private var previousCollectionInfos = config.getAllConnectionInfo()

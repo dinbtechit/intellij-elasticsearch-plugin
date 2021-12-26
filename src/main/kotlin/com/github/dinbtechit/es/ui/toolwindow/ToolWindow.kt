@@ -2,10 +2,13 @@ package com.github.dinbtechit.es.ui.toolwindow
 
 import com.github.dinbtechit.es.actions.*
 import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
+import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
+import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -33,9 +36,9 @@ class ElasticsearchToolWindow : ToolWindowFactory, DumbAware {
 class ToolWindowContents(
     private val toolWindow: ToolWindow,
     project: Project
-) : SimpleToolWindowPanel(true, true), Disposable {
+) : SimpleToolWindowPanel(true, true), DumbAware, Disposable {
 
-    private val controller = TreeModelController()
+    private val controller = project.service<TreeModelController>()
 
     // Fields
     private val esTree = ElasticsearchTree()
@@ -44,7 +47,7 @@ class ToolWindowContents(
     private val defaultActionGroup = DefaultActionGroup()
     private val manager = ActionManager.getInstance()
     private val newAction = manager.getAction(NewAction.ID)
-    private val refreshAction = manager.getAction(RefreshAction.ID)
+    private val refreshAction = RefreshAction()
     private val duplicateAction = manager.getAction(DuplicateAction.ID)
     private val viewPropertiesAction = manager.getAction(ViewPropertiesAction.ID)
     private val collapseTreeAction = CollapseAction(AllIcons.Actions.Collapseall).apply {
@@ -64,7 +67,7 @@ class ToolWindowContents(
         actionToolbar.setTargetComponent(this)
         toolbar = actionToolbar.component
         setContent(getContentPanel())
-        subscribeToEvents()
+        // subscribeToEvents()
     }
 
     private fun buildToolBar(): DefaultActionGroup {
@@ -105,19 +108,6 @@ class ToolWindowContents(
         return panel
     }
 
-    private fun subscribeToEvents() {
-        controller.subscribe {
-            if (it.propertyName == TreeModelController.EventType.TREE_NODE_SELECTED.name) {
-                ViewPropertiesAction.ENABLED = true
-            } else if (it.propertyName == TreeModelController.EventType.TREE_NODE_UNSELECTED.name) {
-                ViewPropertiesAction.ENABLED = false
-            }
-        }
-        // Tree Selection Events
-        esTree.addTreeSelectionListener {
-            controller.selectedTree(it)
-        }
-    }
 
     override fun getData(dataId: String): Any? {
         super.getData(dataId)
@@ -128,6 +118,7 @@ class ToolWindowContents(
     }
 
     override fun dispose() {
+
     }
 
 }

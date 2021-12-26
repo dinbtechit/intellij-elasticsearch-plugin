@@ -11,6 +11,10 @@ import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.layout.panel
 import com.intellij.util.ui.UIUtil
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -26,7 +30,8 @@ import javax.swing.border.MatteBorder
 class NewConnectionDialog(
     viewType: DialogViewType = DialogViewType.VIEW_PROPERTIES,
     private val selectedConnectionInfo: ConnectionInfo? = null,
-    project: Project) : DialogWrapper(true) {
+    project: Project
+) : DialogWrapper(true) {
 
 
     private var controller = DialogModelController()
@@ -37,6 +42,9 @@ class NewConnectionDialog(
     private val leftMenuPanel = LeftMenuPanel(controller = controller)
     private val rightPanel = RightContentPanel(viewType, controller = controller)
     private var applyAction: ApplyAction = ApplyAction()
+
+    //Jobs
+    private var saveJob: Job? = null
 
     init {
         title = "Elasticsearch Connections"
