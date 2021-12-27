@@ -50,7 +50,7 @@ class ElasticsearchTree : Tree(), DumbAware {
                 else -> "<not found>"
             }
         }, true)
-        config.addChangesListener(SettingsChanged()) {}
+        config.addChangesListener(SettingsChanged(this)) {}
         addTreeSelectionListener {
             controller.selectedTree(it)
         }
@@ -58,9 +58,12 @@ class ElasticsearchTree : Tree(), DumbAware {
 
     }
 
-    inner class SettingsChanged : ElasticSearchConfig.SettingsChangedListener {
+    inner class SettingsChanged(val tree: ElasticsearchTree) : ElasticSearchConfig.SettingsChangedListener {
         override fun settingsChanged() {
-            model = ElasticsearchTreeModel(config.getAllConnectionInfo())
+            val currentModel = tree.model as ElasticsearchTreeModel
+            model = ElasticsearchTreeModel(config.getAllConnectionInfo(), previousRootNode = currentModel.rootNode)
+
+
         }
     }
 
@@ -79,8 +82,9 @@ class ElasticsearchTree : Tree(), DumbAware {
                 icon = value.icon
                 if (value.isConnected) {
                     append(value.data.name)
-                    append(" - (Connected)", SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES, 5, 1)
+                    toolTipText = null
                 } else {
+                    toolTipText = "Not Connected"
                     append(
                         value.data.name, SimpleTextAttributes(
                             SimpleTextAttributes.STYLE_WAVED,
@@ -126,7 +130,7 @@ class ElasticsearchTree : Tree(), DumbAware {
                 val defaultActionGroup = DefaultActionGroup()
                 val actionPopMenu = manager.createActionPopupMenu("Elasticsearch", defaultActionGroup)
                 if (!tree.isSelectionEmpty) {
-                    val node = tree.selectionModel.selectionPaths[0].lastPathComponent as ElasticsearchTreeNode<*>
+                    val node = tree.selectionModel.selectionPaths.first().lastPathComponent as ElasticsearchTreeNode<*>
                     if (node is ElasticsearchConnectionTreeNode) {
                         defaultActionGroup.addAll(node.buildPopMenuItems(tree))
                         defaultActionGroup.addSeparator()

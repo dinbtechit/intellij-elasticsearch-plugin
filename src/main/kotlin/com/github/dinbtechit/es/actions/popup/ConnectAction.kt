@@ -1,5 +1,6 @@
 package com.github.dinbtechit.es.actions.popup
 
+import com.github.dinbtechit.es.ui.toolwindow.models.ElasticsearchTreeModel
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchConnectionTreeNode
 import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
@@ -12,12 +13,14 @@ class ConnectAction : AnAction(
 ) {
 
     override fun actionPerformed(e: AnActionEvent) {
-        val treeModel = e.getData(TreeDataKey.TREE_MODEL) as ElasticsearchTree
-        if (!treeModel!!.isSelectionEmpty
-            && treeModel.selectionPaths[0].lastPathComponent is ElasticsearchConnectionTreeNode
+        val tree = e.getData(TreeDataKey.TREE_MODEL) as ElasticsearchTree
+        if (!tree.isSelectionEmpty
+            && tree.selectionPaths.first().lastPathComponent is ElasticsearchConnectionTreeNode
         ) {
-            val connectionTreeNode = treeModel.selectionPaths[0].lastPathComponent as ElasticsearchConnectionTreeNode
+            val connectionTreeNode = tree.selectionPaths.first().lastPathComponent as ElasticsearchConnectionTreeNode
             connectionTreeNode.connect()
+            val model = tree.model as ElasticsearchTreeModel
+            model.reload(connectionTreeNode)
         }
 
     }

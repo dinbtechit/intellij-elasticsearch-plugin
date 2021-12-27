@@ -1,5 +1,6 @@
 package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
+import com.github.dinbtechit.es.actions.DuplicateAction
 import com.github.dinbtechit.es.actions.RefreshAction
 import com.github.dinbtechit.es.actions.popup.ConnectAction
 import com.github.dinbtechit.es.actions.popup.DisconnectAction
@@ -41,6 +42,8 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
             })
         }
         popupMenuItems.add(RefreshAction())
+        popupMenuItems.addSeparator()
+        popupMenuItems.add(DuplicateAction())
         return popupMenuItems
     }
 

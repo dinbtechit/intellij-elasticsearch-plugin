@@ -8,12 +8,17 @@ import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
 import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.actionSystem.ShortcutSet
 import com.intellij.openapi.components.service
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 class ViewPropertiesAction : AnAction() {
     companion object {
         const val ID = "com.github.dinbtechit.es.actions.ViewPropertiesAction"
     }
+
     var isEnabled = false
     val controller = ProjectUtil.currentProject().service<TreeModelController>()
 
@@ -25,6 +30,13 @@ class ViewPropertiesAction : AnAction() {
                 this.isEnabled = false
             }
         }
+
+        shortcutSet = ShortcutSet {
+            arrayOf(
+                KeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), null)
+            )
+        }
+
     }
 
     override fun actionPerformed(e: AnActionEvent) {

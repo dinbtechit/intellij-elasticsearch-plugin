@@ -26,9 +26,10 @@ class DisconnectAction : AnAction(
     override fun actionPerformed(e: AnActionEvent) {
         val tree = e.getData(TreeDataKey.TREE_MODEL) as ElasticsearchTree
         if (!tree.isSelectionEmpty
-            && tree.selectionPaths[0].lastPathComponent is ElasticsearchConnectionTreeNode
+            && tree.selectionPaths != null
+            && tree.selectionPaths.first().lastPathComponent is ElasticsearchConnectionTreeNode
         ) {
-            val connectionTreeNode = tree.selectionPaths[0].lastPathComponent as ElasticsearchConnectionTreeNode
+            val connectionTreeNode = tree.selectionPaths.first().lastPathComponent as ElasticsearchConnectionTreeNode
             connectionTreeNode.disconnect()
             connectionTreeNode.removeAllChildren()
             val model = tree.model as ElasticsearchTreeModel

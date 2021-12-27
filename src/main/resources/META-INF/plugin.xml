@@ -42,8 +42,8 @@
         <action id="com.github.dinbtechit.es.actions.ViewPropertiesAction"
                 class="com.github.dinbtechit.es.actions.ViewPropertiesAction"
                 icon="AllIcons.General.Settings"
-                text="Elasticsearch: View Properties">
-            <override-text place="Elasticsearch" text="View Properties"/>
+                text="Elasticsearch: Connection Properties">
+            <override-text place="Elasticsearch" text="Connection Properties"/>
         </action>
     </actions>
 
