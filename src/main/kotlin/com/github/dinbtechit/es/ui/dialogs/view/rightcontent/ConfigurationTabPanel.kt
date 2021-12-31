@@ -26,7 +26,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
     private val portLabel = JLabel()
     private val portTextField = JTextField(9)
     private val authenticationLabel = JLabel()
-    private val authTypeComboBox = ComboBox<String>(arrayOf("User & Password", "No Auth"))
+    private val authTypeComboBox = ComboBox(arrayOf("User & Password", "No Auth"))
     private val showPasswordCheckBox = JBCheckBox("Show password")
     private val userLabel = JLabel()
     private val userTextField = JTextField()
@@ -196,63 +196,55 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
 
     inner class AddKeyListener : KeyAdapter() {
         override fun keyReleased(e: KeyEvent?) {
-
-            val valid = when {
-                e != null -> {
-                    (e.keyCode in 48..57) // number keys
-                            || (e.keyCode in 65..90) // letter keys
-                            || (e.keyCode in 96..111) // numpad keys
-                            || (e.keyCode in 192..192) // ;=,-./` (in orde
-                            || (e.keyCode == 8) // backspace
-                            || (e.keyCode == 127) // delete
-                }
-                else -> false
-            }
-
-            /*if (valid.not()) return*/
-
             if (e?.component?.name == "portTextField" || e?.component?.name == "hostTextField") {
-                var currentUrl: URI? = null
-                fun buildUrl(urlStr: String) = URIBuilder().apply {
-                    val url = URL(urlStr)
-                    scheme = url.protocol
-                    host = url.host.trim()
-                    port = url.port
-                    path = url.path.trim()
-                }.build()
-
-                currentUrl = try {
-                    buildUrl(urlTextField.text)
-                } catch (e: MalformedURLException) {
-                    null
-                }
-                if (currentUrl == null) {
-                    currentUrl = buildUrl("http://localhost:9200")
-                }
-                val newUrl = URIBuilder().apply {
-                    scheme = currentUrl!!.scheme
-                    host = hostTextField.text.trim()
-                    if (!portTextField.text.isNullOrEmpty()) {
-                        port = Integer.valueOf(portTextField.text) ?: -1
-                    } else port = -1
-                }
-                urlTextField.text = newUrl.build().toString()
-
+                portOrHostTextFieldKeyEventListener()
             } else if (e?.component?.name == "urlTextField") {
-                val url = try {
-                    URL(urlTextField.text)
-                } catch (e: Exception) {
-                    null
-                }
-                if (url != null) {
-                    hostTextField.text = url.host
-                    portTextField.text = if (url.port != -1) url.port.toString() else ""
-                } else {
-                    hostTextField.text = ""
-                    portTextField.text = ""
-                }
+                urlTextFieldKeyEventListener()
             }
             updateConnectionInfo()
+        }
+    }
+
+    private fun portOrHostTextFieldKeyEventListener() {
+        var currentUrl: URI?
+        fun buildUrl(urlStr: String) = URIBuilder().apply {
+            val url = URL(urlStr)
+            scheme = url.protocol
+            host = url.host.trim()
+            port = url.port
+            path = url.path.trim()
+        }.build()
+
+        currentUrl = try {
+            buildUrl(urlTextField.text)
+        } catch (e: MalformedURLException) {
+            null
+        }
+        if (currentUrl == null) {
+            currentUrl = buildUrl("http://localhost:9200")
+        }
+        val newUrl = URIBuilder().apply {
+            scheme = currentUrl!!.scheme
+            host = hostTextField.text.trim()
+            port = if (!portTextField.text.isNullOrEmpty()) {
+                Integer.valueOf(portTextField.text) ?: -1
+            } else -1
+        }
+        urlTextField.text = newUrl.build().toString()
+    }
+
+    private fun urlTextFieldKeyEventListener() {
+        val url = try {
+            URL(urlTextField.text)
+        } catch (e: Exception) {
+            null
+        }
+        if (url != null) {
+            hostTextField.text = url.host
+            portTextField.text = if (url.port != -1) url.port.toString() else ""
+        } else {
+            hostTextField.text = ""
+            portTextField.text = ""
         }
     }
 
@@ -267,7 +259,7 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
                 }
                 authenticationType = authTypeComboBox.selectedIndex
                 username = userTextField.text
-                password = if (passwordField.password.size > 0) passwordField.password else null
+                password = if (passwordField.password.isNotEmpty()) passwordField.password else null
                 url = urlTextField.text
             }
         )
