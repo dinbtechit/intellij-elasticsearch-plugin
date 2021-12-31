@@ -180,7 +180,8 @@ class ConfigurationTabPanel(private val controller: DialogModelController) : JPa
 
             add(urlHelpTextLabel.apply {
                 text = "Overrides settings above"
-                preferredSize = Dimension(300, 30)
+                preferredSize = Dimension(200, 30)
+                minimumSize = Dimension(200, 30)
                 font = UIUtil.getFont(UIUtil.FontSize.MINI, super.getFont())
                 foreground = UIUtil.getLabelDisabledForeground().brighter()
             }, createGbc(1, 6, isLastElement = true).apply {
