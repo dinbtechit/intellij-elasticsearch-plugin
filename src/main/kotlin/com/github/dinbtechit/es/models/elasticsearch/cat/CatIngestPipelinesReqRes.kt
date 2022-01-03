@@ -1,6 +1,6 @@
 package com.github.dinbtechit.es.models.elasticsearch.cat
 
-import com.github.dinbtechit.es.models.ESIngestPipeline
+import com.github.dinbtechit.es.models.elasticsearch.ESIngestPipeline
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRequest
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchResponse
 

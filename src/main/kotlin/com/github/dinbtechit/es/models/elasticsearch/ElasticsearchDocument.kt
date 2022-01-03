@@ -1,6 +1,9 @@
-package com.github.dinbtechit.es.models
+package com.github.dinbtechit.es.models.elasticsearch
 
-sealed class ElasticsearchDocument(open val displayName:String) {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+
+sealed class ElasticsearchDocument(open val displayName: String) {
     enum class Types(val value: String) {
         ALIAS("Aliases"),
         INDICES("Indices"),
@@ -9,6 +12,7 @@ sealed class ElasticsearchDocument(open val displayName:String) {
     }
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class ESAlias(
     val alias: String = "",
     val index: String = "",
@@ -16,9 +20,9 @@ data class ESAlias(
     val routingIndex: String = "",
     val routingSearch: String = "",
     val isWriteIndex: String = ""
-): ElasticsearchDocument(displayName = alias)
+) : ElasticsearchDocument(displayName = alias)
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class ESIndex(
     val health: String = "",
     val status: String = "",
@@ -26,11 +30,20 @@ data class ESIndex(
     val uuid: String = "",
     val pri: String = "",
     val rep: String = "",
-    val docsCount: String = "",
-    val docsDeleted: String = "",
-    val storeSize: String = "",
-    val priStoreSize: String = ""
-): ElasticsearchDocument(displayName = index)
+    @JsonProperty("docs.count") val docsCount: String = "",
+    @JsonProperty("docs.deleted") val docsDeleted: String = "",
+    @JsonProperty("store.size") val storeSize: String = "",
+    @JsonProperty("pri.store.size") val priStoreSize: String = ""
+) : ElasticsearchDocument(displayName = index)
 
-data class ESIngestPipeline(override val displayName: String): ElasticsearchDocument(displayName)
-data class ESTemplate(override val displayName: String): ElasticsearchDocument(displayName)
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class ESTemplate(
+    @JsonProperty("name") override val displayName: String) :
+    ElasticsearchDocument(displayName)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class ESIngestPipeline(
+    override var displayName: String = "",
+    val description: String = "",
+    val version: String = ""
+) : ElasticsearchDocument(displayName)

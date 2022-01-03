@@ -12,17 +12,12 @@ class ElasticsearchTreeModel(
 ) : DefaultTreeModel(rootNode) {
 
     init {
-        if (previousRootNode == null) {
-            for (connection in connectionInfos) {
+        for (connection in connectionInfos) {
+            if (previousRootNode == null || !isNodeExist(rootNode, previousRootNode, connection)) {
                 rootNode.add(ElasticsearchConnectionTreeNode(connection))
             }
-        } else {
-            for (connection in connectionInfos) {
-                if (!isNodeExist(rootNode, previousRootNode, connection)) {
-                    rootNode.add(ElasticsearchConnectionTreeNode(connection))
-                }
-            }
         }
+        this.nodeStructureChanged(rootNode)
     }
 
     private fun isNodeExist(

@@ -1,9 +1,11 @@
 package com.github.dinbtechit.es.actions
 
-import com.github.dinbtechit.es.models.ElasticsearchDocument
-import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRequest
-import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchResponse
+import com.github.dinbtechit.es.models.elasticsearch.cat.CatAliasesRequest
+import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndicesRequest
+import com.github.dinbtechit.es.models.elasticsearch.cat.CatIngestPipelinesRequest
+import com.github.dinbtechit.es.models.elasticsearch.cat.CatTemplatesRequest
 import com.github.dinbtechit.es.services.ElasticsearchHttpClient
+import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
@@ -28,14 +30,10 @@ class DuplicateAction : AnAction(
         this.addTextOverride("Elasticsearch", "Duplicate")
     }
 
+    // inline fun <S> ObjectMapper.readValue(s: String): List<S> = this.readValue(s, object : TypeReference<List<S>>() {})
 
     override fun actionPerformed(e: AnActionEvent) {
         println("duplicate Clicked")
-        val client = ElasticsearchHttpClient<AbstractElasticsearchRequest,
-                AbstractElasticsearchResponse<ElasticsearchDocument>>()
-        CoroutineScope(Dispatchers.IO).launch {
-            client.run()
-        }
     }
 
     override fun update(e: AnActionEvent) {

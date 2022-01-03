@@ -1,28 +1,55 @@
 package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
 import com.github.dinbtechit.es.actions.DuplicateAction
+import com.github.dinbtechit.es.actions.NewAction
 import com.github.dinbtechit.es.actions.RefreshAction
+import com.github.dinbtechit.es.actions.ViewPropertiesAction
 import com.github.dinbtechit.es.actions.popup.ConnectAction
 import com.github.dinbtechit.es.actions.popup.DisconnectAction
-import com.github.dinbtechit.es.models.ESAlias
-import com.github.dinbtechit.es.models.ESIndex
-import com.github.dinbtechit.es.models.ElasticsearchDocument
+import com.github.dinbtechit.es.actions.popup.new.NewAliasAction
+import com.github.dinbtechit.es.actions.popup.new.NewIndexAction
+import com.github.dinbtechit.es.actions.popup.new.NewPipelineAction
+import com.github.dinbtechit.es.actions.popup.new.NewTemplateAction
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
+import com.intellij.ide.actions.DeleteAction
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.Separator
+import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.util.ui.tree.TreeUtil
 import icons.ElasticsearchIcons
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
-    ElasticsearchTreeNode<ConnectionInfo>(icon = ElasticsearchIcons.logo_16px, connectionInfo) {
+    ElasticsearchTreeNode<ConnectionInfo, ElasticsearchTreeNode<*, *>>(
+        icon = ElasticsearchIcons.logo_16px,
+        connectionInfo
+    ) {
 
     var isConnected = false
+    var isLoading = AtomicBoolean(false)
 
-
-    fun connect() {
+    fun connect(tree: ElasticsearchTree) {
         println("Connecting...")
-        isConnected = true
-        createESNodes(this)
+        isLoading.set(true)
+        val node = this
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                createESNodes(node)
+                isLoading.set(false)
+                isConnected = true
+                println("Connected...")
+            } catch (e: Exception) {
+                this.thisLogger().warn("unable to Connect to Elasticsearch instance", e)
+                node.removeAllChildren()
+                isLoading.set(false)
+            }
+        }
     }
 
     fun refresh() {
@@ -34,8 +61,9 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
         isConnected = false
     }
 
-    fun buildPopMenuItems(tree: ElasticsearchTree): DefaultActionGroup {
+    override fun buildPopMenuItems(tree: ElasticsearchTree): DefaultActionGroup {
         val popupMenuItems = DefaultActionGroup()
+        val manager = ActionManager.getInstance()
         if (!isConnected) popupMenuItems.add(ConnectAction()) else {
             popupMenuItems.add(DisconnectAction().apply {
                 registerCustomShortcutSet(this.shortcutSet, tree)
@@ -43,58 +71,59 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
         }
         popupMenuItems.add(RefreshAction())
         popupMenuItems.addSeparator()
+
+        val newMenuItems = DefaultActionGroup(
+            "New", mutableListOf(
+                manager.getAction(NewAction.ID),
+                Separator(),
+                NewIndexAction(),
+                NewAliasAction(),
+                NewTemplateAction(),
+                NewPipelineAction()
+            )
+        ).apply {
+            this.templatePresentation.icon = AllIcons.General.Add
+            this.isPopup = true
+        }
+
+        popupMenuItems.add(newMenuItems)
         popupMenuItems.add(DuplicateAction())
+        popupMenuItems.add(DeleteAction())
+        popupMenuItems.addSeparator()
+        val viewPropertiesAction = manager.getAction(ViewPropertiesAction.ID) as ViewPropertiesAction
+        if (viewPropertiesAction.isEnabled) popupMenuItems.add(viewPropertiesAction)
         return popupMenuItems
     }
 
     private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) {
+        connectionNode.removeAllChildren()
+        CoroutineScope(Dispatchers.IO).launch {
+            // Index
+            val index = ElasticsearchIndexNode()
+            connectionNode.add(index)
+            index.loadIndices()
+        }
 
-        connectionNode.add(
-            ElasticsearchTreeNode(
-                icon = ElasticsearchIcons.esIndices,
-                data = ElasticsearchDocument.Types.INDICES,
-                childIcon = AllIcons.Nodes.DataTables,
-                childData = listOf(
-                    ESIndex(index = "index1", health = "green", storeSize = "300 Kb"),
-                    ESIndex(index = "index2", health = "green", storeSize = "300 Kb"),
-                    ESIndex(index = "index3", health = "green", storeSize = "300 Kb"),
-                    ESIndex(index = "index4", health = "green", storeSize = "300 Kb"),
-                    ESIndex(index = "index5", health = "green", storeSize = "300 Kb"),
-                )
-            )
-        )
+        CoroutineScope(Dispatchers.IO).launch {
+            // Alias
+            val alias = ElasticsearchAliasNode()
+            connectionNode.add(alias)
+            alias.loadIndices()
+        }
 
-        connectionNode.add(
-            ElasticsearchTreeNode(
-                icon = ElasticsearchIcons.esAliases,
-                data = ElasticsearchDocument.Types.ALIAS,
-                childIcon = AllIcons.Nodes.DataTables,
-                childData = listOf(
-                    ESAlias("alias1"),
-                    ESAlias("alias2")
-                )
-            )
-        )
+        CoroutineScope(Dispatchers.IO).launch {
+            // Template
+            val template = ElasticsearchTemplateNode()
+            connectionNode.add(template)
+            template.loadIndices()
+        }
 
-        connectionNode.add(
-            ElasticsearchTreeNode(
-                icon = ElasticsearchIcons.esTemplates,
-                data = ElasticsearchDocument.Types.TEMPLATES,
-                childIcon = AllIcons.Nodes.DataSchema,
-                childData = listOf(
-                    ESAlias("template1"),
-                    ESAlias("template2")
-                )
-            )
-        )
-
-        connectionNode.add(
-            ElasticsearchTreeNode(
-                icon = ElasticsearchIcons.esPipelines,
-                data = ElasticsearchDocument.Types.INGEST_PIPELINES,
-                childIcon = AllIcons.Nodes.TabPin,
-            )
-        )
+        CoroutineScope(Dispatchers.IO).launch {
+            // Pipeline
+            val pipeline = ElasticsearchPipelineNode()
+            connectionNode.add(pipeline)
+            pipeline.loadIndices()
+        }
     }
 
 }

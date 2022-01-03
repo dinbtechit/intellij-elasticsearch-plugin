@@ -18,7 +18,7 @@ class ConnectAction : AnAction(
             && tree.selectionPaths.first().lastPathComponent is ElasticsearchConnectionTreeNode
         ) {
             val connectionTreeNode = tree.selectionPaths.first().lastPathComponent as ElasticsearchConnectionTreeNode
-            connectionTreeNode.connect()
+            connectionTreeNode.connect(tree)
             val model = tree.model as ElasticsearchTreeModel
             model.reload(connectionTreeNode)
         }

@@ -1,6 +1,5 @@
 package com.github.dinbtechit.es.models.elasticsearch
 
-import com.github.dinbtechit.es.models.ElasticsearchDocument
 
 abstract class AbstractElasticsearchRequest(
     val url: String = "",

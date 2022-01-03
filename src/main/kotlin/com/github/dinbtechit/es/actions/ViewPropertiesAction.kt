@@ -42,10 +42,10 @@ class ViewPropertiesAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val model = e.getData(TreeDataKey.TREE_MODEL)?.selectionModel
         val treePath = model?.selectionPaths?.toList()?.first()
-        fun getTopLevelNode(treePath: ElasticsearchTreeNode<*>?): ElasticsearchTreeNode<*>? {
-            if (treePath is ElasticsearchTreeNode<*>) {
+        fun getTopLevelNode(treePath: ElasticsearchTreeNode<*, *>?): ElasticsearchTreeNode<*, *>? {
+            if (treePath is ElasticsearchTreeNode<*, *>) {
                 val currentPath = treePath
-                val parentPath = currentPath.parent as ElasticsearchTreeNode<*>
+                val parentPath = currentPath.parent as ElasticsearchTreeNode<*, *>
                 if (parentPath.data is String) return currentPath
                 return getTopLevelNode(parentPath)
             }
@@ -53,7 +53,7 @@ class ViewPropertiesAction : AnAction() {
         }
 
         val connectionInfo = try {
-            getTopLevelNode(treePath?.lastPathComponent as ElasticsearchTreeNode<*>?)?.data as ConnectionInfo
+            getTopLevelNode(treePath?.lastPathComponent as ElasticsearchTreeNode<*, *>?)?.data as ConnectionInfo
         } catch (e: Exception) {
             null
         }

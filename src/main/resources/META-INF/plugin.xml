@@ -27,9 +27,9 @@
     <actions>
         <action id="com.github.dinbtechit.es.actions.NewAction"
                 class="com.github.dinbtechit.es.actions.NewAction"
-                icon="AllIcons.General.Add"
+                icon="ElasticsearchIcons.newconnection"
                 text="Elasticsearch: New Connection">
-            <override-text place="Elasticsearch" text="New"/>
+            <override-text place="Elasticsearch" text="New Connection"/>
         </action>
 
         <action id="com.github.dinbtechit.es.actions.DuplicateAction"
@@ -41,7 +41,7 @@
 
         <action id="com.github.dinbtechit.es.actions.ViewPropertiesAction"
                 class="com.github.dinbtechit.es.actions.ViewPropertiesAction"
-                icon="AllIcons.General.Settings"
+                icon="ElasticsearchIcons.connectionProperties"
                 text="Elasticsearch: Connection Properties">
             <override-text place="Elasticsearch" text="Connection Properties"/>
         </action>

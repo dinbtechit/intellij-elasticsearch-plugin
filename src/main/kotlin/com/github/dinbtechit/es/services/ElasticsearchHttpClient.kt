@@ -1,24 +1,19 @@
 package com.github.dinbtechit.es.services
 
+import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRequest
+import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.intellij.openapi.components.Service
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.IOException
 
-class ElasticsearchHttpClient<R, S>: OkHttpClient() {
-
-    fun run() {
-        val request = Request.Builder()
-            .url("http://sportsrpt-dinesh.int.spsc-np.cloud.gracenote.com:9200/_cat/indices?format=json&pretty")
+@Service
+class ElasticsearchHttpClient<in R : AbstractElasticsearchRequest> : OkHttpClient() {
+    fun sendRequest(connectionInfo: ConnectionInfo, request: R): String {
+        val httpRequest = Request.Builder()
+            .url("${connectionInfo.url}/${request.path}?format=json&pretty")
             .build()
-
-        this.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-            for ((name, value ) in response.headers) {
-                println("$name: $value")
-            }
-            println(response.body!!.string())
-        }
+        val res = this.newCall(httpRequest).execute()
+        return res.body!!.string()
     }
 
 }
