@@ -18,11 +18,8 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.util.ui.tree.TreeUtil
 import icons.ElasticsearchIcons
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
@@ -97,33 +94,25 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
 
     private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) {
         connectionNode.removeAllChildren()
-        CoroutineScope(Dispatchers.IO).launch {
             // Index
             val index = ElasticsearchIndexNode()
             connectionNode.add(index)
-            index.loadIndices()
-        }
+            index.loadDocuments()
 
-        CoroutineScope(Dispatchers.IO).launch {
             // Alias
             val alias = ElasticsearchAliasNode()
             connectionNode.add(alias)
-            alias.loadIndices()
-        }
+            alias.loadDocuments()
 
-        CoroutineScope(Dispatchers.IO).launch {
             // Template
             val template = ElasticsearchTemplateNode()
             connectionNode.add(template)
-            template.loadIndices()
-        }
+            template.loadDocuments()
 
-        CoroutineScope(Dispatchers.IO).launch {
             // Pipeline
             val pipeline = ElasticsearchPipelineNode()
             connectionNode.add(pipeline)
-            pipeline.loadIndices()
-        }
+            pipeline.loadDocuments()
     }
 
 }

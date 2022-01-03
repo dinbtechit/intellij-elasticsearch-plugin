@@ -21,7 +21,7 @@ class ElasticsearchPipelineNode : ElasticsearchTreeNode<ElasticsearchDocument.Ty
         //loadIndices()
     }
 
-    fun loadIndices() {
+    fun loadDocuments() {
         val client = ElasticsearchHttpClient<CatIngestPipelinesRequest>()
         val connection = if (this.parent is ElasticsearchConnectionTreeNode)
             (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()

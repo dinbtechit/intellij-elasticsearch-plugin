@@ -17,9 +17,9 @@ data class ESAlias(
     val alias: String = "",
     val index: String = "",
     val filter: String = "",
-    val routingIndex: String = "",
-    val routingSearch: String = "",
-    val isWriteIndex: String = ""
+    @JsonProperty("routing.index") val routingIndex: String = "",
+    @JsonProperty("routing.search") val routingSearch: String = "",
+    @JsonProperty("is_write_index") val isWriteIndex: String = ""
 ) : ElasticsearchDocument(displayName = alias)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -38,7 +38,8 @@ data class ESIndex(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ESTemplate(
-    @JsonProperty("name") override val displayName: String) :
+    @JsonProperty("name") override val displayName: String,
+    @JsonProperty("index_patterns") val indexPatterns: String) :
     ElasticsearchDocument(displayName)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
