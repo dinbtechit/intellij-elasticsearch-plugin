@@ -30,6 +30,7 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
 
     var isConnected = false
     var isLoading = AtomicBoolean(false)
+    var isError = false
 
     fun connect(tree: ElasticsearchTree) {
         println("Connecting...")
@@ -45,6 +46,7 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
                 this.thisLogger().warn("unable to Connect to Elasticsearch instance", e)
                 node.removeAllChildren()
                 isLoading.set(false)
+                isError = true
             }
         }
     }

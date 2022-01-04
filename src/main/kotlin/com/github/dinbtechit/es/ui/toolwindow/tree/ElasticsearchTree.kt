@@ -11,14 +11,12 @@ import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchConnectionTreeNode
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchRootNode
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchTreeNode
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
-import com.intellij.ui.AnimatedIcon
-import com.intellij.ui.ColoredTreeCellRenderer
-import com.intellij.ui.SimpleTextAttributes
-import com.intellij.ui.TreeSpeedSearch
+import com.intellij.ui.*
 import com.intellij.ui.speedSearch.SpeedSearchUtil
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
@@ -97,6 +95,9 @@ class ElasticsearchTree(
                     icon = ElasticsearchIcons.logo_grey_16px
                     append(value.data.name, SimpleTextAttributes.GRAY_ATTRIBUTES)
                     toolTipText = "Not Connected"
+                    if (value.isError) {
+                       icon = ElasticsearchIcons.logo_grey_error_16px
+                    }
                 }
             } else if (value is ElasticsearchTreeNode<*, *>) {
                 icon = value.icon

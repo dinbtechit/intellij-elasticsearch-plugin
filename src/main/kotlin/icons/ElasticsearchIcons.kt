@@ -7,6 +7,7 @@ object ElasticsearchIcons {
     val logo = IconLoader.getIcon("/icons/elasticsearch-icon-13px.svg", javaClass)
     val logo_16px = IconLoader.getIcon("/icons/elasticsearch-icon-16px.svg", javaClass)
     val logo_grey_16px = IconLoader.getIcon("/icons/elasticsearch-icon-grey-16px.svg", javaClass)
+    val logo_grey_error_16px = IconLoader.getIcon("/icons/elasticsearch-icon-grey-error-16px.svg", javaClass)
 
     @JvmField
     val connectionProperties = IconLoader.getIcon("/icons/connection-properties.svg", javaClass)
