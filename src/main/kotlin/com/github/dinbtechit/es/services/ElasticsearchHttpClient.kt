@@ -1,5 +1,6 @@
 package com.github.dinbtechit.es.services
 
+import com.github.dinbtechit.es.exception.ElasticsearchHttpException
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRequest
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.intellij.openapi.components.Service
@@ -13,6 +14,7 @@ class ElasticsearchHttpClient<in R : AbstractElasticsearchRequest> : OkHttpClien
             .url("${connectionInfo.url}/${request.path}?format=json&pretty")
             .build()
         val res = this.newCall(httpRequest).execute()
+        if (res.code != 200) throw ElasticsearchHttpException(res.body!!.string())
         return res.body!!.string()
     }
 

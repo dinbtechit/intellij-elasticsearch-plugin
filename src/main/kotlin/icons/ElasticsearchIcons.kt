@@ -19,4 +19,16 @@ object ElasticsearchIcons {
     val esPipelines = IconLoader.getIcon("/icons/es-pipeline-16px.svg", javaClass)
     val esTemplates = IconLoader.getIcon("/icons/es-template-16px.svg", javaClass)
 
+    //General
+    object General {
+        val DataTable_16px = IconLoader.getIcon("/icons/datatable-16px.svg", javaClass)
+        val DataTable_ReadOnly_16px = IconLoader.getIcon("/icons/dataTable-readonly-16px.svg", javaClass)
+    }
+
+    object Index {
+        val DataTable_Green_16px = IconLoader.getIcon("/icons/datatable-green-16px.svg", javaClass)
+        val DataTable_Yellow_16px = IconLoader.getIcon("/icons/datatable-yellow-16px.svg", javaClass)
+        val DataTable_Red_16px = IconLoader.getIcon("/icons/datatable-red-16px.svg", javaClass)
+    }
+
 }

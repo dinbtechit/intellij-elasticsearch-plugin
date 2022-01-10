@@ -18,35 +18,43 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.progress.runBackgroundableTask
 import icons.ElasticsearchIcons
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
-    ElasticsearchTreeNode<ConnectionInfo, ElasticsearchTreeNode<*, *>>(
-        icon = ElasticsearchIcons.logo_16px,
-        connectionInfo
-    ) {
+class ElasticsearchConnectionTreeNode(
+    val connectionInfo: ConnectionInfo
+) : ElasticsearchTreeNode<ConnectionInfo, ElasticsearchTreeNode<*, *>>(
+    icon = ElasticsearchIcons.logo_16px,
+    connectionInfo
+) {
 
     var isConnected = false
     var isLoading = AtomicBoolean(false)
     var isError = false
 
     fun connect(tree: ElasticsearchTree) {
-        println("Connecting...")
         isLoading.set(true)
         val node = this
         CoroutineScope(Dispatchers.Default).launch {
-            try {
-                createESNodes(node)
-                isLoading.set(false)
-                isConnected = true
-                println("Connected...")
-            } catch (e: Exception) {
-                this.thisLogger().warn("unable to Connect to Elasticsearch instance", e)
-                node.removeAllChildren()
-                isLoading.set(false)
-                isError = true
+            runBackgroundableTask(
+                "Elasticsearch: Connecting to ${connectionInfo.name}...",
+                com.github.dinbtechit.es.shared.ProjectUtil.currentProject(),
+                false
+            ) { progressIndicator ->
+                progressIndicator.isIndeterminate = true
+                try {
+                    createESNodes(node)
+                    isConnected = true
+                    println("Connected...")
+                } catch (e: Exception) {
+                    this.thisLogger().warn("unable to Connect to Elasticsearch instance", e)
+                    node.removeAllChildren()
+                    isError = true
+                } finally {
+                    isLoading.set(false)
+                }
             }
         }
     }
@@ -96,25 +104,20 @@ class ElasticsearchConnectionTreeNode(connectionInfo: ConnectionInfo) :
 
     private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) {
         connectionNode.removeAllChildren()
-            // Index
-            val index = ElasticsearchIndexNode()
-            connectionNode.add(index)
-            index.loadDocuments()
+        // Index
+        val index = ElasticsearchIndexNode()
+        connectionNode.add(index)
+        index.loadDocuments()
 
-            // Alias
-            val alias = ElasticsearchAliasNode()
-            connectionNode.add(alias)
-            alias.loadDocuments()
+        // Template
+        val template = ElasticsearchTemplateNode()
+        connectionNode.add(template)
+        template.loadDocuments()
 
-            // Template
-            val template = ElasticsearchTemplateNode()
-            connectionNode.add(template)
-            template.loadDocuments()
-
-            // Pipeline
-            val pipeline = ElasticsearchPipelineNode()
-            connectionNode.add(pipeline)
-            pipeline.loadDocuments()
+        // Pipeline
+        val pipeline = ElasticsearchPipelineNode()
+        connectionNode.add(pipeline)
+        pipeline.loadDocuments()
     }
 
 }

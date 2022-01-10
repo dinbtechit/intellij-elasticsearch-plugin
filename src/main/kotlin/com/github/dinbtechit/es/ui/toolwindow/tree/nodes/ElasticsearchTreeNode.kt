@@ -13,19 +13,22 @@ open class ElasticsearchTreeNode<P, C>(
     var childData: MutableList<C> = mutableListOf()
 ) : DefaultMutableTreeNode(), DumbAware {
 
-    open val popupMenuItems: DefaultActionGroup = DefaultActionGroup()
+    open var popupMenuItems: DefaultActionGroup? = null
 
     init {
         loadChildren()
     }
 
-    fun loadChildren() {
+    fun loadChildren(childPopup: DefaultActionGroup? = null) {
         if (childData.isNotEmpty()) {
-            for (d in childData) add(ElasticsearchTreeNode<C, String>(childIcon, d))
+            for (d in childData) add(ElasticsearchTreeNode<C, String>(childIcon, d).apply {
+                popupMenuItems = childPopup
+            })
         }
     }
 
     open fun buildPopMenuItems(tree: ElasticsearchTree): DefaultActionGroup = DefaultActionGroup()
-
     data class Empty(val emptyString: String)
 }
+
+data class ChildData<T>(val icon: Icon?, val data: T)

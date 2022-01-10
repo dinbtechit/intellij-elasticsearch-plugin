@@ -8,15 +8,18 @@ import com.github.dinbtechit.es.services.state.getAllConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.toolwindow.models.ElasticsearchTreeModel
 import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
+import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ChildData
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchConnectionTreeNode
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchRootNode
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchTreeNode
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
-import com.intellij.ui.*
+import com.intellij.ui.AnimatedIcon
+import com.intellij.ui.ColoredTreeCellRenderer
+import com.intellij.ui.SimpleTextAttributes
+import com.intellij.ui.TreeSpeedSearch
 import com.intellij.ui.speedSearch.SpeedSearchUtil
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
@@ -96,7 +99,7 @@ class ElasticsearchTree(
                     append(value.data.name, SimpleTextAttributes.GRAY_ATTRIBUTES)
                     toolTipText = "Not Connected"
                     if (value.isError) {
-                       icon = ElasticsearchIcons.logo_grey_error_16px
+                        icon = ElasticsearchIcons.logo_grey_error_16px
                     }
                 }
             } else if (value is ElasticsearchTreeNode<*, *>) {
@@ -114,11 +117,31 @@ class ElasticsearchTree(
                             append(" ${value.childCount}", SimpleTextAttributes.GRAYED_SMALL_ATTRIBUTES)
                         }
                     }
+                    is ChildData<*> -> {
+                        icon = value.data.icon
+                        when (value.data.data) {
+                            is ElasticsearchDocument -> {
+                                append(value.data.data.displayName)
+                            }
+                        }
+                    }
                     is ElasticsearchDocument -> {
                         if (value.data is ESIndex) {
+
+                            icon = when (value.data.health) {
+                                ESIndex.Health.GREEN -> {
+                                    ElasticsearchIcons.Index.DataTable_Green_16px
+                                }
+                                ESIndex.Health.YELLOW -> {
+                                    ElasticsearchIcons.Index.DataTable_Yellow_16px
+                                }
+                                ESIndex.Health.RED -> {
+                                    ElasticsearchIcons.Index.DataTable_Red_16px
+                                }
+                            }
+
                             append(value.data.displayName)
                             append(" ${value.data.storeSize}", SimpleTextAttributes.GRAY_SMALL_ATTRIBUTES)
-                            append(" - Health ${value.data.health}", SimpleTextAttributes.GRAY_SMALL_ATTRIBUTES)
 
                         } else append(value.data.displayName)
                     }
@@ -143,9 +166,10 @@ class ElasticsearchTree(
                 val defaultActionGroup = DefaultActionGroup()
                 val actionPopMenu = manager.createActionPopupMenu("Elasticsearch", defaultActionGroup)
                 if (!tree.isSelectionEmpty) {
-                    val node =
-                        tree.selectionModel.selectionPaths.first().lastPathComponent as ElasticsearchTreeNode<*, *>
+                    val node = tree.selectionModel.selectionPaths.first()
+                        .lastPathComponent as ElasticsearchTreeNode<*, *>
                     defaultActionGroup.add(node.buildPopMenuItems(tree))
+                    if (node.popupMenuItems != null) defaultActionGroup.add(node.popupMenuItems!!)
                     defaultActionGroup.addSeparator()
                 }
                 actionPopMenu.setTargetComponent(tree)
