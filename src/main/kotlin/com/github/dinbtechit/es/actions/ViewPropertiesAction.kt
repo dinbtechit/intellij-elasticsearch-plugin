@@ -11,10 +11,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.ShortcutSet
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.DumbAware
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class ViewPropertiesAction : AnAction() {
+class ViewPropertiesAction : AnAction(), DumbAware {
     companion object {
         const val ID = "com.github.dinbtechit.es.actions.ViewPropertiesAction"
     }

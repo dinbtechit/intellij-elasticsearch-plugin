@@ -1,18 +1,22 @@
 package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
+import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.dinbtechit.es.actions.popup.index.*
 import com.github.dinbtechit.es.actions.popup.new.NewAliasAction
 import com.github.dinbtechit.es.actions.popup.new.NewIndexAction
+import com.github.dinbtechit.es.exception.ElasticsearchHttpException
 import com.github.dinbtechit.es.models.elasticsearch.ESIndex
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
+import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndexReq
 import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndicesRequest
 import com.github.dinbtechit.es.services.ElasticsearchHttpClient
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.diagnostic.thisLogger
 import icons.ElasticsearchIcons
 
 class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types, ESIndex>(
@@ -21,6 +25,8 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
     ElasticsearchIcons.General.DataTable_16px
 ) {
 
+    private val mapper = jacksonObjectMapper()
+
     init {
         // loadIndices()
     }
@@ -28,9 +34,8 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
     fun loadDocuments() {
         val client = ElasticsearchHttpClient<CatIndicesRequest>()
         val connection = if (this.parent is ElasticsearchConnectionTreeNode)
-                (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+            (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
         val json = client.sendRequest(connection, CatIndicesRequest())
-        val mapper = jacksonObjectMapper()
         childData = mapper.readValue(json)
         loadChildren(buildChildPopupMenuItems())
         loadAliases()
@@ -39,9 +44,22 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
     private fun loadAliases() {
         for (node in children()) {
             if (node is ElasticsearchTreeNode<*, *>) {
-                val aliasNode = ElasticsearchAliasNode()
-                aliasNode.loadDocuments((node.data as ESIndex).displayName)
-                node.add(aliasNode)
+                try {
+                    val client = ElasticsearchHttpClient<CatIndexReq>()
+                    val connection = if (this.parent is ElasticsearchConnectionTreeNode)
+                        (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+                    val indexName = (node.data as ESIndex).displayName
+                    val json = client.sendRequest(connection, CatIndexReq(indexName))
+                    val result: Map<String, Any> = mapper.readValue(json)
+
+                    val index: Map<String, Any> = mapper.convertValue(result[indexName]!!)
+                    val aliases: Map<String, Any> = mapper.convertValue(index["aliases"]!!)
+                    val aliasNode = ElasticsearchAliasNode()
+                    aliasNode.loadDocuments(aliases)
+                    node.add(aliasNode)
+                } catch (e: ElasticsearchHttpException) {
+                    this.thisLogger().warn("ResponseCode=${e.body.status}, Reason=${e.body.error.reason}")
+                }
             }
         }
     }

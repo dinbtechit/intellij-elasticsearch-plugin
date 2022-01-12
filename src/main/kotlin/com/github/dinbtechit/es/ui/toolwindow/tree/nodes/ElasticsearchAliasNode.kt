@@ -23,16 +23,8 @@ class ElasticsearchAliasNode :
         //loadIndices()
     }
 
-    fun loadDocuments(indexName: String) {
-        try {
-            val client = ElasticsearchHttpClient<CatIndexReq>()
-            val connection = if (this.parent is ElasticsearchConnectionTreeNode)
-                (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
-            val json = client.sendRequest(connection, CatIndexReq(indexName))
+    fun loadDocuments(aliases: Map<String, Any>) {
             val mapper = jacksonObjectMapper()
-            val result: Map<String, Any> = mapper.readValue(json)
-            val index: Map<String, Any> = mapper.convertValue(result[indexName]!!)
-            val aliases: Map<String, Any> = mapper.convertValue(index["aliases"]!!)
             for ((k, v) in aliases) {
                 val alias = mapper.convertValue<ESAlias>(v)
                 alias.displayName = k
@@ -45,9 +37,6 @@ class ElasticsearchAliasNode :
                 childData.add(child)
             }
             loadChildren()
-        } catch (e: ElasticsearchHttpException) {
-            this.thisLogger().warn("ResponseCode=${e.body.status}, Reason=${e.body.error.reason}")
-        }
     }
 
 }

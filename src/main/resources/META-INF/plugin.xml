@@ -7,6 +7,12 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+
+        <fileEditorProvider implementation="com.github.dinbtechit.es.ui.editor.ESFileEditorProvider"/>
+        <fileIconProvider implementation="com.github.dinbtechit.es.ui.editor.ESFileIconProvider" order="first"/>
+        <fileType name="ElasticsearchFile" implementationClass="com.github.dinbtechit.es.ui.editor.ESFileType"
+            fieldName="INSTANCE" extensions="esi"/>
+
         <applicationService
                 serviceImplementation="com.github.dinbtechit.es.services.MyApplicationService"/>
         <projectService

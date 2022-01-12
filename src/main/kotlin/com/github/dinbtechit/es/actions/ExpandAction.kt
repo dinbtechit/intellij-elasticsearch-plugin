@@ -4,11 +4,12 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.ShortcutSet
+import com.intellij.openapi.project.DumbAware
 import java.awt.event.KeyEvent
 import javax.swing.Icon
 import javax.swing.KeyStroke
 
-class ExpandAction(icon: Icon) : AnAction("Expand", "Expand elasticsearch", icon) {
+class ExpandAction(icon: Icon) : AnAction("Expand", "Expand elasticsearch", icon), DumbAware {
 
     init {
         shortcutSet = ShortcutSet {

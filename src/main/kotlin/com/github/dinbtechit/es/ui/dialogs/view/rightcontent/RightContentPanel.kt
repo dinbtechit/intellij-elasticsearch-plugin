@@ -3,6 +3,7 @@ package com.github.dinbtechit.es.ui.dialogs.view.rightcontent
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
 import com.github.dinbtechit.es.ui.dialogs.model.DialogViewType
+import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTabbedPane
 import java.awt.*
@@ -107,6 +108,8 @@ class RightContentPanel(
             preferredSize = Dimension(Int.MAX_VALUE, 50)
             isVisible = tabbedPanel.selectedIndex == 0
             border = MatteBorder(1, 0, 1, 0, Color.decode("#2F3233"))
+
+            add(HyperlinkLabel("Test connection"))
         }
         add(bottomPanel, BorderLayout.SOUTH)
     }

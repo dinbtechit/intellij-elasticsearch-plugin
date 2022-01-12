@@ -1,5 +1,6 @@
 package com.github.dinbtechit.es.actions
 
+import com.github.dinbtechit.es.actions.popup.ConnectAction
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
 import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
@@ -10,12 +11,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.ShortcutSet
 import com.intellij.openapi.components.service
+import com.intellij.openapi.project.DumbAware
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 class RefreshAction : AnAction(
     "Refresh", "Refresh Elasticsearch connection", AllIcons.Actions.Refresh
-) {
+), DumbAware {
     var isEnabled = false
     val controller = ProjectUtil.currentProject().service<TreeModelController>()
 
@@ -28,7 +30,7 @@ class RefreshAction : AnAction(
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        println("Refresh Clicked")
+        ConnectAction().actionPerformed(e)
     }
 
     override fun update(e: AnActionEvent) {

@@ -6,6 +6,7 @@ import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.services.state.ElasticSearchConfig
 import com.github.dinbtechit.es.services.state.getAllConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
+import com.github.dinbtechit.es.ui.editor.ESVirtualFile
 import com.github.dinbtechit.es.ui.toolwindow.models.ElasticsearchTreeModel
 import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ChildData
@@ -15,6 +16,8 @@ import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchTreeNode
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.ColoredTreeCellRenderer
@@ -52,6 +55,7 @@ class ElasticsearchTree(
         setCellRenderer(ElasticsearchTreeCellRenderer())
         expandRow(0)
         isRootVisible = false
+        toggleClickCount = 0
         treeSpeedSearch = TreeSpeedSearch(this, { treePath ->
             val node = treePath.lastPathComponent as ElasticsearchTreeNode<*, *>
             when (node.data) {
@@ -159,6 +163,9 @@ class ElasticsearchTree(
                 val tree = e.component as ElasticsearchTree
                 val selectNode = TreeUtil.getSelectedPathIfOne(tree)!!.lastPathComponent as ElasticsearchTreeNode<*, *>
                 println("Double Clicked ${selectNode.data}")
+                if (selectNode.data is ElasticsearchDocument) {
+                    FileEditorManager.getInstance(project).openFile(selectNode.virtualFile!!, true)
+                }
             }
             if (SwingUtilities.isRightMouseButton(e)) {
                 val tree = e!!.component as ElasticsearchTree

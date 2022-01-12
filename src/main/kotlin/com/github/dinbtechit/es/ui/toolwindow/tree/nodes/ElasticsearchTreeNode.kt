@@ -1,8 +1,11 @@
 package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
+import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
+import com.github.dinbtechit.es.ui.editor.ESVirtualFile
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.Icon
 import javax.swing.tree.DefaultMutableTreeNode
 
@@ -14,6 +17,7 @@ open class ElasticsearchTreeNode<P, C>(
 ) : DefaultMutableTreeNode(), DumbAware {
 
     open var popupMenuItems: DefaultActionGroup? = null
+    var virtualFile: ESVirtualFile? = null
 
     init {
         loadChildren()
@@ -23,6 +27,7 @@ open class ElasticsearchTreeNode<P, C>(
         if (childData.isNotEmpty()) {
             for (d in childData) add(ElasticsearchTreeNode<C, String>(childIcon, d).apply {
                 popupMenuItems = childPopup
+                if (d is ElasticsearchDocument) virtualFile = ESVirtualFile(d.displayName)
             })
         }
     }

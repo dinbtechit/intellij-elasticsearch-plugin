@@ -11,13 +11,15 @@ import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.project.DumbAwareToggleAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DuplicateAction : AnAction(
     "Elasticsearch: Duplicate", "Duplicate elasticsearch connection", AllIcons.Actions.Copy
-) {
+), DumbAware {
 
     companion object {
         const val ID = "com.github.dinbtechit.es.actions.DuplicateAction"
