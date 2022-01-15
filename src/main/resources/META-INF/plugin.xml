@@ -13,6 +13,8 @@
         <fileType name="ElasticsearchFile" implementationClass="com.github.dinbtechit.es.ui.editor.ESFileType"
             fieldName="INSTANCE" extensions="esi"/>
 
+        <notificationGroup displayType="BALLOON" id="Elasticsearch Connection"/>
+
         <applicationService
                 serviceImplementation="com.github.dinbtechit.es.services.MyApplicationService"/>
         <projectService
@@ -21,7 +23,7 @@
                 serviceImplementation="com.github.dinbtechit.es.services.MyProjectService"/>
         <toolWindow
                 factoryClass="com.github.dinbtechit.es.ui.toolwindow.ElasticsearchToolWindow"
-                icon="ElasticsearchIcons.logo"
+                icon="ElasticsearchIcons.Logo_Small"
                 anchor="right"
                 secondary="true"
                 order="last"
@@ -33,7 +35,7 @@
     <actions>
         <action id="com.github.dinbtechit.es.actions.NewAction"
                 class="com.github.dinbtechit.es.actions.NewAction"
-                icon="ElasticsearchIcons.newconnection"
+                icon="ElasticsearchIcons.NewConnection"
                 text="Elasticsearch: New Connection">
             <override-text place="Elasticsearch" text="New Connection"/>
         </action>

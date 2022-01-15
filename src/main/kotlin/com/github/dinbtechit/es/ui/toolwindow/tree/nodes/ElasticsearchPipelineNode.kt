@@ -10,6 +10,9 @@ import com.github.dinbtechit.es.services.ElasticsearchHttpClient
 import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.intellij.icons.AllIcons
 import icons.ElasticsearchIcons
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ElasticsearchPipelineNode : ElasticsearchTreeNode<ElasticsearchDocument.Types, ESIngestPipeline>(
     ElasticsearchIcons.esPipelines,
@@ -22,19 +25,22 @@ class ElasticsearchPipelineNode : ElasticsearchTreeNode<ElasticsearchDocument.Ty
     }
 
     fun loadDocuments() {
-        val client = ElasticsearchHttpClient<CatIngestPipelinesRequest>()
-        val connection = if (this.parent is ElasticsearchConnectionTreeNode)
-            (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
-        val json = client.sendRequest(connection, CatIngestPipelinesRequest())
-        val mapper = jacksonObjectMapper()
-        val result: Map<String, Any> = mapper.readValue(json)
+        val obj = this
+        CoroutineScope(Dispatchers.IO).launch {
+            val client = ElasticsearchHttpClient<CatIngestPipelinesRequest>()
+            val connection = if (obj.parent is ElasticsearchConnectionTreeNode)
+                (obj.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+            val json = client.sendRequest(connection, CatIngestPipelinesRequest())
+            val mapper = jacksonObjectMapper()
+            val result: Map<String, Any> = mapper.readValue(json)
 
-        for ((k, v) in result) {
-            val pipeline = mapper.convertValue<ESIngestPipeline>(v)
-            pipeline.displayName = k
-            super.childData.add(pipeline)
+            for ((k, v) in result) {
+                val pipeline = mapper.convertValue<ESIngestPipeline>(v)
+                pipeline.displayName = k
+                super.childData.add(pipeline)
+            }
+            loadChildren()
         }
-        loadChildren()
     }
 
 }

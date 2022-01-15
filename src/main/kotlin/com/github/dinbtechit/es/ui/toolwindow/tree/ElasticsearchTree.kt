@@ -6,7 +6,6 @@ import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.services.state.ElasticSearchConfig
 import com.github.dinbtechit.es.services.state.getAllConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
-import com.github.dinbtechit.es.ui.editor.ESVirtualFile
 import com.github.dinbtechit.es.ui.toolwindow.models.ElasticsearchTreeModel
 import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ChildData
@@ -17,7 +16,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.ColoredTreeCellRenderer
@@ -91,19 +89,23 @@ class ElasticsearchTree(
             hasFocus: Boolean
         ) {
             if (value is ElasticsearchConnectionTreeNode) {
-                if (value.isLoading.get()) {
-                    icon = loadingIcon
-                    append(value.data.name)
-                } else if (value.isConnected) {
-                    toolTipText = null
-                    icon = ElasticsearchIcons.logo_16px
-                    append(value.data.name)
-                } else {
-                    icon = ElasticsearchIcons.logo_grey_16px
-                    append(value.data.name, SimpleTextAttributes.GRAY_ATTRIBUTES)
-                    toolTipText = "Not Connected"
-                    if (value.isError) {
-                        icon = ElasticsearchIcons.logo_grey_error_16px
+                when {
+                    value.isLoading.get() -> {
+                        icon = loadingIcon
+                        append(value.data.name)
+                    }
+                    value.isConnected -> {
+                        toolTipText = null
+                        icon = ElasticsearchIcons.Logo
+                        append(value.data.name)
+                    }
+                    else -> {
+                        icon = ElasticsearchIcons.logo_grey_16px
+                        append(value.data.name, SimpleTextAttributes.GRAY_ATTRIBUTES)
+                        toolTipText = "Not Connected"
+                        if (value.isError) {
+                            icon = ElasticsearchIcons.logo_grey_error_16px
+                        }
                     }
                 }
             } else if (value is ElasticsearchTreeNode<*, *>) {
@@ -158,9 +160,11 @@ class ElasticsearchTree(
 
     inner class ElasticsearchTreeMouseAdaptor : MouseAdapter(), DumbAware {
 
-        override fun mousePressed(e: MouseEvent?) {
-            if (SwingUtilities.isLeftMouseButton(e) && e!!.clickCount == 2) {
-                val tree = e.component as ElasticsearchTree
+        override fun mousePressed(e: MouseEvent) {
+            val tree = e.component as ElasticsearchTree
+            val selRow = tree.getRowForLocation(e.x, e.y)
+            val treePath = tree.getPathForLocation(e.x, e.y)
+            if (selRow != -1 && treePath != null && SwingUtilities.isLeftMouseButton(e) && e.clickCount == 2) {
                 val selectNode = TreeUtil.getSelectedPathIfOne(tree)!!.lastPathComponent as ElasticsearchTreeNode<*, *>
                 println("Double Clicked ${selectNode.data}")
                 if (selectNode.data is ElasticsearchDocument) {

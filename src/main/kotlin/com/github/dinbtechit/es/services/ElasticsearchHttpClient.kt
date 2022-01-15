@@ -9,7 +9,7 @@ import okhttp3.Request
 
 @Service
 class ElasticsearchHttpClient<in R : AbstractElasticsearchRequest> : OkHttpClient() {
-    fun sendRequest(connectionInfo: ConnectionInfo, request: R): String {
+    suspend fun sendRequest(connectionInfo: ConnectionInfo, request: R): String {
         val httpRequest = Request.Builder()
             .url("${connectionInfo.url}/${request.path}?format=json&pretty")
             .build()

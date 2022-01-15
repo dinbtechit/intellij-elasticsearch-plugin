@@ -12,6 +12,6 @@ class ESFileType : FileType {
     override fun getName(): String = "ElasticsearchFile"
     override fun getDescription(): String = "Elasticsearch file type"
     override fun getDefaultExtension(): String = "esi"
-    override fun getIcon(): Icon = ElasticsearchIcons.logo_16px
+    override fun getIcon(): Icon = ElasticsearchIcons.Logo
     override fun isBinary(): Boolean = false
 }

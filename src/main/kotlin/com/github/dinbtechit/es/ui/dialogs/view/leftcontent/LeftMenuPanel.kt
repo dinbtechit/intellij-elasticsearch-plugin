@@ -227,7 +227,7 @@ class LeftMenuPanel(
             selected: Boolean,
             hasFocus: Boolean
         ) {
-            icon = ElasticsearchIcons.logo_16px
+            icon = ElasticsearchIcons.Logo
             append(value?.name ?: "@${value?.hostname}")
         }
     }

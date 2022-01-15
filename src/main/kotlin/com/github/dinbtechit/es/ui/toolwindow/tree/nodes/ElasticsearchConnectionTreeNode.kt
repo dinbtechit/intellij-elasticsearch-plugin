@@ -10,10 +10,14 @@ import com.github.dinbtechit.es.actions.popup.new.NewAliasAction
 import com.github.dinbtechit.es.actions.popup.new.NewIndexAction
 import com.github.dinbtechit.es.actions.popup.new.NewPipelineAction
 import com.github.dinbtechit.es.actions.popup.new.NewTemplateAction
+import com.github.dinbtechit.es.notification.NotificationID
 import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.DeleteAction
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.Separator
@@ -26,13 +30,17 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ElasticsearchConnectionTreeNode(
     val connectionInfo: ConnectionInfo
 ) : ElasticsearchTreeNode<ConnectionInfo, ElasticsearchTreeNode<*, *>>(
-    icon = ElasticsearchIcons.logo_16px,
+    icon = ElasticsearchIcons.Logo,
     connectionInfo
 ) {
+
+    private val project = ProjectUtil.currentProject()
+
 
     var isConnected = false
     var isLoading = AtomicBoolean(false)
     var isError = false
+
 
     fun connect(tree: ElasticsearchTree) {
         isLoading.set(true)
@@ -49,7 +57,18 @@ class ElasticsearchConnectionTreeNode(
                     isConnected = true
                     println("Connected...")
                 } catch (e: Exception) {
-                    this.thisLogger().warn("unable to Connect to Elasticsearch instance", e)
+                    this.thisLogger().warn("Unable to Connect to " +
+                            "Elasticsearch instance - ${connectionInfo.name}", e)
+
+                    val notificationContent = """
+                        Unable to connect to ${connectionInfo.name} 
+                        due to ${e.message}.
+                        Try again or check if the cluster is available.
+                    """.trimIndent()
+                    NotificationGroupManager.getInstance().getNotificationGroup(NotificationID.ConnectionNotification)
+                        .createNotification(notificationContent, NotificationType.ERROR)
+                        .notify(project)
+
                     node.removeAllChildren()
                     isError = true
                 } finally {

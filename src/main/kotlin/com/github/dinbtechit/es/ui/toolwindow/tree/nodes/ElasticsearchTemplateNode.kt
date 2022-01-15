@@ -11,6 +11,9 @@ import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import icons.ElasticsearchIcons
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ElasticsearchTemplateNode : ElasticsearchTreeNode<ElasticsearchDocument.Types, ESTemplate>(
     ElasticsearchIcons.esTemplates,
@@ -23,13 +26,15 @@ class ElasticsearchTemplateNode : ElasticsearchTreeNode<ElasticsearchDocument.Ty
     }
 
     fun loadDocuments() {
-        val client = ElasticsearchHttpClient<CatTemplatesRequest>()
-        val connection = if (this.parent is ElasticsearchConnectionTreeNode)
-            (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
-        val json = client.sendRequest(connection, CatTemplatesRequest())
-        val mapper = jacksonObjectMapper()
-        super.childData = mapper.readValue(json)
-        loadChildren()
+        CoroutineScope(Dispatchers.IO).launch {
+            val client = ElasticsearchHttpClient<CatTemplatesRequest>()
+            val connection = if (this@ElasticsearchTemplateNode.parent is ElasticsearchConnectionTreeNode)
+                (this@ElasticsearchTemplateNode.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+            val json = client.sendRequest(connection, CatTemplatesRequest())
+            val mapper = jacksonObjectMapper()
+            super.childData = mapper.readValue(json)
+            loadChildren()
+        }
     }
 
     override fun buildPopMenuItems(tree: ElasticsearchTree): DefaultActionGroup {

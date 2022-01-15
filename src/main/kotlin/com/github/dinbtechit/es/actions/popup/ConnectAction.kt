@@ -7,10 +7,11 @@ import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAware
 
 class ConnectAction : AnAction(
     "Connect", "Connect elasticsearch connection", AllIcons.Actions.Execute
-) {
+), DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
         val tree = e.getData(TreeDataKey.TREE_MODEL) as ElasticsearchTree

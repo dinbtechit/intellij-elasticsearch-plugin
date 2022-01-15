@@ -10,7 +10,7 @@ class ESFileIconProvider : FileIconProvider {
 
     override fun getIcon(file: VirtualFile, flags: Int, project: Project?): Icon? {
         return when (file) {
-            is ESVirtualFile -> ElasticsearchIcons.logo
+            is ESVirtualFile -> ElasticsearchIcons.DataTable.DefaultTable
             else -> null
         }
     }

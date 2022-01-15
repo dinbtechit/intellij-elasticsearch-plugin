@@ -18,6 +18,9 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.diagnostic.thisLogger
 import icons.ElasticsearchIcons
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types, ESIndex>(
     ElasticsearchIcons.esIndices,
@@ -32,33 +35,39 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
     }
 
     fun loadDocuments() {
-        val client = ElasticsearchHttpClient<CatIndicesRequest>()
-        val connection = if (this.parent is ElasticsearchConnectionTreeNode)
-            (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
-        val json = client.sendRequest(connection, CatIndicesRequest())
-        childData = mapper.readValue(json)
-        loadChildren(buildChildPopupMenuItems())
-        loadAliases()
+        val obj = this
+        CoroutineScope(Dispatchers.IO).launch {
+            val client = ElasticsearchHttpClient<CatIndicesRequest>()
+            val connection = if (obj.parent is ElasticsearchConnectionTreeNode)
+                (obj.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+            val json = client.sendRequest(connection, CatIndicesRequest())
+            childData = mapper.readValue(json)
+            loadChildren(buildChildPopupMenuItems())
+            loadAliases()
+        }
     }
 
     private fun loadAliases() {
+        val obj = this
         for (node in children()) {
             if (node is ElasticsearchTreeNode<*, *>) {
-                try {
-                    val client = ElasticsearchHttpClient<CatIndexReq>()
-                    val connection = if (this.parent is ElasticsearchConnectionTreeNode)
-                        (this.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
-                    val indexName = (node.data as ESIndex).displayName
-                    val json = client.sendRequest(connection, CatIndexReq(indexName))
-                    val result: Map<String, Any> = mapper.readValue(json)
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val client = ElasticsearchHttpClient<CatIndexReq>()
+                        val connection = if (obj.parent is ElasticsearchConnectionTreeNode)
+                            (obj.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+                        val indexName = (node.data as ESIndex).displayName
+                        val json = client.sendRequest(connection, CatIndexReq(indexName))
+                        val result: Map<String, Any> = mapper.readValue(json)
 
-                    val index: Map<String, Any> = mapper.convertValue(result[indexName]!!)
-                    val aliases: Map<String, Any> = mapper.convertValue(index["aliases"]!!)
-                    val aliasNode = ElasticsearchAliasNode()
-                    aliasNode.loadDocuments(aliases)
-                    node.add(aliasNode)
-                } catch (e: ElasticsearchHttpException) {
-                    this.thisLogger().warn("ResponseCode=${e.body.status}, Reason=${e.body.error.reason}")
+                        val index: Map<String, Any> = mapper.convertValue(result[indexName]!!)
+                        val aliases: Map<String, Any> = mapper.convertValue(index["aliases"]!!)
+                        val aliasNode = ElasticsearchAliasNode()
+                        aliasNode.loadDocuments(aliases)
+                        node.add(aliasNode)
+                    } catch (e: ElasticsearchHttpException) {
+                        this.thisLogger().warn("ResponseCode=${e.body.status}, Reason=${e.body.error.reason}")
+                    }
                 }
             }
         }
