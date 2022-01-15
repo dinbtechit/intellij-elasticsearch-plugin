@@ -23,13 +23,17 @@ class EditorHeader : NonOpaquePanel() {
                 add(DeleteRowAction())
                 add(RevertChangeAction())
                 add(CommitChangesAction())
-            }, true)
+            }, true).apply {
+                setTargetComponent(this@EditorHeader)
+            }
 
         val secondToolbar = ActionManager.getInstance()
             .createActionToolbar("ElasticsearchEditor", DefaultActionGroup().apply {
                 add(ChangeViewAction())
                 add(EditorSettingsAction())
-            }, true)
+            }, true).apply {
+                setTargetComponent(this@EditorHeader)
+            }
 
         add(firstToolbar.component, HorizontalLayout.LEFT)
         add(secondToolbar.component, HorizontalLayout.RIGHT)
