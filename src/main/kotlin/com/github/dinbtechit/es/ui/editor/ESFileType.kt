@@ -1,6 +1,7 @@
 package com.github.dinbtechit.es.ui.editor
 
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.vfs.VirtualFile
 import icons.ElasticsearchIcons
 import javax.swing.Icon
 
@@ -14,4 +15,5 @@ class ESFileType : FileType {
     override fun getDefaultExtension(): String = "esi"
     override fun getIcon(): Icon = ElasticsearchIcons.Logo
     override fun isBinary(): Boolean = false
+    override fun getCharset(file: VirtualFile, content: ByteArray?): String? = null
 }
