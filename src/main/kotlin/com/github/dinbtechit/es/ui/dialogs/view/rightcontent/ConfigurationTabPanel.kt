@@ -1,6 +1,6 @@
 package com.github.dinbtechit.es.ui.dialogs.view.rightcontent
 
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
 import com.github.dinbtechit.es.ui.shared.textfield.LengthRestrictedDocument
 import com.intellij.openapi.ui.ComboBox

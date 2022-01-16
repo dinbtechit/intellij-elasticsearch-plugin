@@ -6,7 +6,7 @@ import com.github.dinbtechit.es.models.elasticsearch.ESTemplate
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
 import com.github.dinbtechit.es.models.elasticsearch.cat.CatTemplatesRequest
 import com.github.dinbtechit.es.services.ElasticsearchHttpClient
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DefaultActionGroup

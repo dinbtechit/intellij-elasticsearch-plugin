@@ -12,7 +12,7 @@ import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
 import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndexReq
 import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndicesRequest
 import com.github.dinbtechit.es.services.ElasticsearchHttpClient
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.DefaultActionGroup

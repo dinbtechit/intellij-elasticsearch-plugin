@@ -1,21 +1,11 @@
 package com.github.dinbtechit.es.actions
 
-import com.github.dinbtechit.es.models.elasticsearch.cat.CatAliasesRequest
-import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndicesRequest
-import com.github.dinbtechit.es.models.elasticsearch.cat.CatIngestPipelinesRequest
-import com.github.dinbtechit.es.models.elasticsearch.cat.CatTemplatesRequest
-import com.github.dinbtechit.es.services.ElasticsearchHttpClient
-import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.models.TreeDataKey
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAware
-import com.intellij.openapi.project.DumbAwareToggleAction
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DuplicateAction : AnAction(
     "Elasticsearch: Duplicate", "Duplicate elasticsearch connection", AllIcons.Actions.Copy

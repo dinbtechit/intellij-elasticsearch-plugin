@@ -6,9 +6,12 @@ import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.ColumnInfo
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.ListTableModel
+import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.JPanel
+import javax.swing.table.DefaultTableColumnModel
+import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableColumn
 import javax.swing.table.TableModel
 
@@ -48,4 +51,14 @@ class EditorContent : JPanel() {
 
 }
 
-class EditorTableModel : ListTableModel<String>() {}
+class EditorColumnModel: DefaultTableColumnModel() {
+
+}
+
+class EditorTableModel : DefaultTableModel() {
+    init {
+
+    }
+
+
+}

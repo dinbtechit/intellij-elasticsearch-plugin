@@ -1,8 +1,8 @@
 package com.github.dinbtechit.es.services
 
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.exception.ElasticsearchHttpException
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRequest
-import com.github.dinbtechit.es.services.state.ConnectionInfo
 import com.intellij.openapi.components.Service
 import okhttp3.OkHttpClient
 import okhttp3.Request

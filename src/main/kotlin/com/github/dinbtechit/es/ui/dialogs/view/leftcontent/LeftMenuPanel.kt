@@ -1,7 +1,7 @@
 package com.github.dinbtechit.es.ui.dialogs.view.leftcontent
 
 import com.github.dinbtechit.es.actions.RefreshAction
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController.EventType
 import com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar.AddAction

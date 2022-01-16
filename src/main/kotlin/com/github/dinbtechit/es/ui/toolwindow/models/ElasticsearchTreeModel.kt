@@ -1,6 +1,6 @@
 package com.github.dinbtechit.es.ui.toolwindow.models
 
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchConnectionTreeNode
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchRootNode
 import javax.swing.tree.DefaultTreeModel

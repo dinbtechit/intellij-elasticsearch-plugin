@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAware
 
-class NewAction : AnAction(), DumbAware {
+class NewAction : AnAction() {
     companion object {
         const val ID = "com.github.dinbtechit.es.actions.NewAction"
     }

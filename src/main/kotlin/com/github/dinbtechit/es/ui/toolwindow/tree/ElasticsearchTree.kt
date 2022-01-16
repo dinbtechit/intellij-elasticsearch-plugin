@@ -2,9 +2,9 @@ package com.github.dinbtechit.es.ui.toolwindow.tree
 
 import com.github.dinbtechit.es.models.elasticsearch.ESIndex
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
-import com.github.dinbtechit.es.services.state.ConnectionInfo
-import com.github.dinbtechit.es.services.state.ElasticSearchConfig
-import com.github.dinbtechit.es.services.state.getAllConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ElasticSearchConfig
+import com.github.dinbtechit.es.configuration.getAllConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.toolwindow.models.ElasticsearchTreeModel
 import com.github.dinbtechit.es.ui.toolwindow.service.TreeModelController
@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities
 @Suppress("UnstableApiUsage")
 class ElasticsearchTree(
     val rootNode: ElasticsearchRootNode = ElasticsearchRootNode()
-) : Tree(rootNode), DumbAware {
+) : Tree(rootNode) {
 
     val loadingIcon = AnimatedIcon.Default()
 
@@ -126,26 +126,16 @@ class ElasticsearchTree(
                     is ChildData<*> -> {
                         icon = value.data.icon
                         when (value.data.data) {
-                            is ElasticsearchDocument -> {
-                                append(value.data.data.displayName)
-                            }
+                            is ElasticsearchDocument -> append(value.data.data.displayName)
                         }
                     }
                     is ElasticsearchDocument -> {
                         if (value.data is ESIndex) {
-
                             icon = when (value.data.health) {
-                                ESIndex.Health.GREEN -> {
-                                    ElasticsearchIcons.Index.DataTable_Green_16px
-                                }
-                                ESIndex.Health.YELLOW -> {
-                                    ElasticsearchIcons.Index.DataTable_Yellow_16px
-                                }
-                                ESIndex.Health.RED -> {
-                                    ElasticsearchIcons.Index.DataTable_Red_16px
-                                }
+                                ESIndex.Health.GREEN -> ElasticsearchIcons.Index.DataTable_Green_16px
+                                ESIndex.Health.YELLOW -> ElasticsearchIcons.Index.DataTable_Yellow_16px
+                                ESIndex.Health.RED -> ElasticsearchIcons.Index.DataTable_Red_16px
                             }
-
                             append(value.data.displayName)
                             append(" ${value.data.storeSize}", SimpleTextAttributes.GRAY_SMALL_ATTRIBUTES)
 

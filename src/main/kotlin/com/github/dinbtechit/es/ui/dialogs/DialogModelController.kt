@@ -1,9 +1,9 @@
 package com.github.dinbtechit.es.ui.dialogs
 
-import com.github.dinbtechit.es.services.state.ConnectionInfo
-import com.github.dinbtechit.es.services.state.ConnectionInfoState
-import com.github.dinbtechit.es.services.state.ElasticSearchConfig
-import com.github.dinbtechit.es.services.state.getAllConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfoState
+import com.github.dinbtechit.es.configuration.ElasticSearchConfig
+import com.github.dinbtechit.es.configuration.getAllConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.dialogs.Constants.CREDS_SERVICE_NAME
 import com.intellij.credentialStore.Credentials

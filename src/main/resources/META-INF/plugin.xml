@@ -18,7 +18,7 @@
         <applicationService
                 serviceImplementation="com.github.dinbtechit.es.services.MyApplicationService"/>
         <projectService
-                serviceImplementation="com.github.dinbtechit.es.services.state.ElasticSearchConfig"/>
+                serviceImplementation="com.github.dinbtechit.es.configuration.ElasticSearchConfig"/>
         <projectService
                 serviceImplementation="com.github.dinbtechit.es.services.MyProjectService"/>
         <toolWindow

@@ -2,7 +2,7 @@ package com.github.dinbtechit.es.ui.editor.components
 
 
 import com.github.dinbtechit.es.actions.editorToolbar.*
-import com.github.dinbtechit.es.actions.editorToolbar.secondGroup.ChangeViewAction
+import com.github.dinbtechit.es.actions.editorToolbar.secondGroup.ChangeViewActionGroup
 import com.github.dinbtechit.es.actions.editorToolbar.secondGroup.EditorSettingsAction
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -17,6 +17,8 @@ class EditorHeader : NonOpaquePanel() {
 
         val firstToolbar = ActionManager.getInstance()
             .createActionToolbar("ElasticsearchEditor", DefaultActionGroup().apply {
+                add(SetRowSizeAction())
+                addSeparator()
                 add(RefreshEditorAction())
                 addSeparator()
                 add(InsertRowAction())
@@ -29,7 +31,7 @@ class EditorHeader : NonOpaquePanel() {
 
         val secondToolbar = ActionManager.getInstance()
             .createActionToolbar("ElasticsearchEditor", DefaultActionGroup().apply {
-                add(ChangeViewAction())
+                add(ChangeViewActionGroup())
                 add(EditorSettingsAction())
             }, true).apply {
                 setTargetComponent(this@EditorHeader)

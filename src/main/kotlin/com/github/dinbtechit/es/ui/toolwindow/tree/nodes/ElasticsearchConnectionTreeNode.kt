@@ -11,7 +11,7 @@ import com.github.dinbtechit.es.actions.popup.new.NewIndexAction
 import com.github.dinbtechit.es.actions.popup.new.NewPipelineAction
 import com.github.dinbtechit.es.actions.popup.new.NewTemplateAction
 import com.github.dinbtechit.es.notification.NotificationID
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons

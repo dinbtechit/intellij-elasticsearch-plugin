@@ -7,7 +7,7 @@ import com.github.dinbtechit.es.models.elasticsearch.ESIngestPipeline
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
 import com.github.dinbtechit.es.models.elasticsearch.cat.CatIngestPipelinesRequest
 import com.github.dinbtechit.es.services.ElasticsearchHttpClient
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.intellij.icons.AllIcons
 import icons.ElasticsearchIcons
 import kotlinx.coroutines.CoroutineScope

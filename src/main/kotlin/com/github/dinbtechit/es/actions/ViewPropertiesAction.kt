@@ -1,6 +1,6 @@
 package com.github.dinbtechit.es.actions
 
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.dialogs.view.NewConnectionDialog
 import com.github.dinbtechit.es.ui.toolwindow.tree.nodes.ElasticsearchTreeNode

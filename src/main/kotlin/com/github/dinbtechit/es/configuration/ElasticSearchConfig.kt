@@ -1,4 +1,4 @@
-package com.github.dinbtechit.es.services.state
+package com.github.dinbtechit.es.configuration
 
 import com.github.dinbtechit.es.ui.dialogs.Constants
 import com.intellij.ide.passwordSafe.PasswordSafe

@@ -1,6 +1,6 @@
 package com.github.dinbtechit.es.ui.dialogs.view.leftcontent.toolbar
 
-import com.github.dinbtechit.es.services.state.ConnectionInfo
+import com.github.dinbtechit.es.configuration.ConnectionInfo
 import com.github.dinbtechit.es.ui.dialogs.DialogModelController
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
