@@ -1,5 +1,7 @@
 package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.dinbtechit.es.actions.DuplicateAction
 import com.github.dinbtechit.es.actions.NewAction
 import com.github.dinbtechit.es.actions.RefreshAction
@@ -12,6 +14,10 @@ import com.github.dinbtechit.es.actions.popup.new.NewPipelineAction
 import com.github.dinbtechit.es.actions.popup.new.NewTemplateAction
 import com.github.dinbtechit.es.notification.NotificationID
 import com.github.dinbtechit.es.configuration.ConnectionInfo
+import com.github.dinbtechit.es.exception.ElasticsearchHttpException
+import com.github.dinbtechit.es.models.elasticsearch.Cluster
+import com.github.dinbtechit.es.models.elasticsearch.cat.CatClusterReq
+import com.github.dinbtechit.es.services.ElasticsearchHttpClient
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.toolwindow.tree.ElasticsearchTree
 import com.intellij.icons.AllIcons
@@ -30,8 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ElasticsearchConnectionTreeNode(
     val connectionInfo: ConnectionInfo
 ) : ElasticsearchTreeNode<ConnectionInfo, ElasticsearchTreeNode<*, *>>(
-    icon = ElasticsearchIcons.Logo,
-    connectionInfo
+    icon = ElasticsearchIcons.Logo, connectionInfo
 ) {
 
     private val project = ProjectUtil.currentProject()
@@ -45,37 +50,38 @@ class ElasticsearchConnectionTreeNode(
     fun connect(tree: ElasticsearchTree) {
         isLoading.set(true)
         val node = this
-        CoroutineScope(Dispatchers.Default).launch {
-            runBackgroundableTask(
-                "Elasticsearch: Connecting to ${connectionInfo.name}...",
-                com.github.dinbtechit.es.shared.ProjectUtil.currentProject(),
-                false
-            ) { progressIndicator ->
-                progressIndicator.isIndeterminate = true
-                try {
-                    createESNodes(node)
-                    isConnected = true
-                    println("Connected...")
-                } catch (e: Exception) {
-                    this.thisLogger().warn("Unable to Connect to " +
-                            "Elasticsearch instance - ${connectionInfo.name}", e)
 
-                    val notificationContent = """
+        runBackgroundableTask(
+            "Elasticsearch: Connecting to ${connectionInfo.name}...", ProjectUtil.currentProject(), false
+        ) { progressIndicator ->
+
+            progressIndicator.isIndeterminate = true
+            try {
+                createESNodes(node)
+                isConnected = true
+                println("Connected...")
+            } catch (e: Exception) {
+                this.thisLogger().warn(
+                    "Unable to Connect to " + "Elasticsearch instance - ${connectionInfo.name}", e
+                )
+
+                val notificationContent = """
                         Unable to connect to ${connectionInfo.name} 
                         due to ${e.message}.
                         Try again or check if the cluster is available.
                     """.trimIndent()
-                    NotificationGroupManager.getInstance().getNotificationGroup(NotificationID.ConnectionNotification)
-                        .createNotification(notificationContent, NotificationType.ERROR)
-                        .notify(project)
+                NotificationGroupManager.getInstance()
+                    .getNotificationGroup(NotificationID.ConnectionNotification)
+                    .createNotification(notificationContent, NotificationType.ERROR).notify(project)
 
-                    node.removeAllChildren()
-                    isError = true
-                } finally {
-                    isLoading.set(false)
-                }
+                node.removeAllChildren()
+                isError = true
+            } finally {
+                isLoading.set(false)
             }
         }
+
+
     }
 
     fun refresh() {
@@ -121,7 +127,17 @@ class ElasticsearchConnectionTreeNode(
         return popupMenuItems
     }
 
-    private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) {
+    private suspend fun connect(): Cluster {
+        val json = ElasticsearchHttpClient<CatClusterReq>().sendRequest(connectionInfo, CatClusterReq())
+        return jacksonObjectMapper().readValue(json)
+    }
+
+
+    private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) = runBlocking {
+
+        val cluster = connect()
+        println(cluster)
+
         connectionNode.removeAllChildren()
         // Index
         val index = ElasticsearchIndexNode()
@@ -137,6 +153,6 @@ class ElasticsearchConnectionTreeNode(
         val pipeline = ElasticsearchPipelineNode()
         connectionNode.add(pipeline)
         pipeline.loadDocuments()
-    }
 
+    }
 }

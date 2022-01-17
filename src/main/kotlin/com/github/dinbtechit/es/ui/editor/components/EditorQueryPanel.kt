@@ -1,13 +1,9 @@
 package com.github.dinbtechit.es.ui.editor.components
 
 import com.github.dinbtechit.es.shared.ProjectUtil
-import com.intellij.openapi.editor.colors.*
 import com.intellij.openapi.fileTypes.PlainTextFileType
-import com.intellij.openapi.graph.impl.option.TableEditorFactoryImpl
 import com.intellij.ui.EditorTextField
-import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBEmptyBorder
-import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.JPanel
