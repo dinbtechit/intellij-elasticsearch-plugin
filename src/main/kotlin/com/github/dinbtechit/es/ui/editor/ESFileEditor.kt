@@ -18,10 +18,7 @@ class ESFileEditor(
 ) : UserDataHolderBase(), FileEditor, DumbAware {
 
     private var isActive = false
-
-
-    // Components
-    private val basePanel = BasePanel()
+    private val basePanel = BasePanel(file)
 
     override fun getFile(): VirtualFile = virtualFile
     override fun getComponent(): JComponent = basePanel

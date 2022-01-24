@@ -5,7 +5,7 @@ import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchReques
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchResponse
 
 class CatIngestPipelinesRequest(
-    override val path: String = "_ingest/pipeline"
+    override val path: String = "_ingest/pipeline?format=json&pretty"
 ): AbstractElasticsearchRequest() {
 }
 

@@ -6,7 +6,7 @@ import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRespon
 import com.github.dinbtechit.es.models.elasticsearch.ESAlias
 
 class CatAliasesRequest(
-    override val path: String = "_cat/aliases"
+    override val path: String = "_cat/aliases?format=json&pretty"
 ): AbstractElasticsearchRequest() {
 }
 

@@ -5,5 +5,5 @@ import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchReques
 
 class CatIndexReq(
     override val path: String
-): AbstractElasticsearchRequest(path = path) {
+): AbstractElasticsearchRequest(path = "$path?format=json&pretty") {
 }

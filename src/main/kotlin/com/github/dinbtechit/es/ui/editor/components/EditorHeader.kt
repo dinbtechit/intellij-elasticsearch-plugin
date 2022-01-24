@@ -20,10 +20,12 @@ class EditorHeader : NonOpaquePanel() {
                 add(SetRowSizeAction())
                 addSeparator()
                 add(RefreshEditorAction())
+                add(StopQueryProgressAction())
                 addSeparator()
                 add(InsertRowAction())
                 add(DeleteRowAction())
                 add(RevertChangeAction())
+                add(PreviewQuerySubmissionAction())
                 add(CommitChangesAction())
             }, true).apply {
                 setTargetComponent(this@EditorHeader)

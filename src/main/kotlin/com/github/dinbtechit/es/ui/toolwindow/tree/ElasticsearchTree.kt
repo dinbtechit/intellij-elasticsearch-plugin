@@ -142,6 +142,9 @@ class ElasticsearchTree(
                         } else append(value.data.displayName)
                     }
                 }
+                if (value.isLoading.get()) {
+                    icon = loadingIcon
+                }
             }
             SpeedSearchUtil.applySpeedSearchHighlighting(this, this, true, true)
         }
@@ -158,7 +161,9 @@ class ElasticsearchTree(
                 val selectNode = TreeUtil.getSelectedPathIfOne(tree)!!.lastPathComponent as ElasticsearchTreeNode<*, *>
                 println("Double Clicked ${selectNode.data}")
                 if (selectNode.data is ElasticsearchDocument) {
+                    selectNode.isLoading.set(true)
                     FileEditorManager.getInstance(project).openFile(selectNode.virtualFile!!, true)
+                    selectNode.isLoading.set(false)
                 }
             }
             if (SwingUtilities.isRightMouseButton(e)) {

@@ -33,6 +33,8 @@ object ElasticsearchIcons {
 
     object DataTable {
         val DefaultTable = IconLoader.getIcon("/icons/datatable-16px.svg", javaClass)
+        val Column = IconLoader.getIcon("/icons/database/col.svg", javaClass)
+        val PreviewChanges = IconLoader.getIcon("/icons/database/previewChanges.svg", javaClass)
     }
 
     object Index {

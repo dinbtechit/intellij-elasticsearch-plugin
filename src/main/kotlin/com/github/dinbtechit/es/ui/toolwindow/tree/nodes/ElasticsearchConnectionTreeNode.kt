@@ -43,7 +43,6 @@ class ElasticsearchConnectionTreeNode(
 
 
     var isConnected = false
-    var isLoading = AtomicBoolean(false)
     var isError = false
 
 

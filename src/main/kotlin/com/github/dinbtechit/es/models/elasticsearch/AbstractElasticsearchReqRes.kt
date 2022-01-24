@@ -1,12 +1,15 @@
 package com.github.dinbtechit.es.models.elasticsearch
 
+import okhttp3.RequestBody
+
 
 abstract class AbstractElasticsearchRequest(
     val url: String = "",
     open val path: String = "",
+    open val method: String = "GET",
     val header: Map<String, String>? = null,
     val queryParams: Map<String, String>? = null,
-    val body: String = ""
+    val body: RequestBody? = null
 ) {
 }
 

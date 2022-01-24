@@ -22,6 +22,7 @@ class ConnectAction : AnAction(
             connectionTreeNode.connect(tree)
             val model = tree.model as ElasticsearchTreeModel
             model.reload(connectionTreeNode)
+            tree.repaint()
         }
 
     }

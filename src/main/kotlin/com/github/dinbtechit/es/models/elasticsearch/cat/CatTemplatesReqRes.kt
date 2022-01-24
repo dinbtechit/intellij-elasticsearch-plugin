@@ -5,7 +5,7 @@ import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchReques
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchResponse
 
 class CatTemplatesRequest(
-    override val path: String = "_cat/templates"
+    override val path: String = "_cat/templates?format=json&pretty"
 ) : AbstractElasticsearchRequest() {
 }
 
