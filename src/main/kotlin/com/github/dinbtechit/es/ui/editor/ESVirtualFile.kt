@@ -9,7 +9,7 @@ import java.io.OutputStream
 
 open class ESVirtualFile(
     private val fileName: String = "Default",
-    val connection: ConnectionInfo
+    val connection: ConnectionInfo?
 ) : VirtualFile(), DumbAware {
 
     override fun getName(): String = fileName

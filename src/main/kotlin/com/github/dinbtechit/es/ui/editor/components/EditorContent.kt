@@ -82,7 +82,7 @@ class EditorContent(
                     val mapper = jacksonObjectMapper()
 
                     val mappingRequest = ElasticsearchHttpClient<MappingReq>()
-                    val mappingResultJson = mappingRequest.sendRequest(file.connection, MappingReq(file.name))
+                    val mappingResultJson = mappingRequest.sendRequest(file.connection!!, MappingReq(file.name))
                     val mappings = mutableListOf<String>()
                     val tempResult: Map<String, Map<String, Any?>> = mapper.readValue(mappingResultJson)
                     val firstMappings = tempResult[file.name]?.get("mappings")

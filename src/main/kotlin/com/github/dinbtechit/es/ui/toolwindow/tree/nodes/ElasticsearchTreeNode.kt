@@ -29,7 +29,8 @@ open class ElasticsearchTreeNode<P, C>(
         if (childData.isNotEmpty()) {
             for (d in childData) add(ElasticsearchTreeNode<C, String>(childIcon, d).apply {
                 popupMenuItems = childPopup
-                if (d is ElasticsearchDocument) virtualFile = ESVirtualFile(d.displayName, ConnectionInfo())
+                if (d is ElasticsearchDocument) virtualFile = ESVirtualFile(d.displayName,
+                    getConnectionNode(this@ElasticsearchTreeNode))
             })
         }
     }
