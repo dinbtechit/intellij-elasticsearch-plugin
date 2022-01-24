@@ -9,7 +9,7 @@ import com.github.dinbtechit.es.actions.popup.new.NewIndexAction
 import com.github.dinbtechit.es.exception.ElasticsearchHttpException
 import com.github.dinbtechit.es.models.elasticsearch.ESIndex
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
-import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndexReq
+import com.github.dinbtechit.es.models.elasticsearch.index.BaseIndex
 import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndicesRequest
 import com.github.dinbtechit.es.services.ElasticsearchHttpClient
 import com.github.dinbtechit.es.configuration.ConnectionInfo
@@ -36,7 +36,7 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
 
     fun loadDocuments() {
         val obj = this
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             val client = ElasticsearchHttpClient<CatIndicesRequest>()
             val connection = if (obj.parent is ElasticsearchConnectionTreeNode)
                 (obj.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
@@ -51,13 +51,13 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
         val obj = this
         for (node in children()) {
             if (node is ElasticsearchTreeNode<*, *>) {
-                CoroutineScope(Dispatchers.IO).launch {
+                CoroutineScope(Dispatchers.Default).launch {
                     try {
-                        val client = ElasticsearchHttpClient<CatIndexReq>()
+                        val client = ElasticsearchHttpClient<BaseIndex>()
                         val connection = if (obj.parent is ElasticsearchConnectionTreeNode)
                             (obj.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
                         val indexName = (node.data as ESIndex).displayName
-                        val json = client.sendRequest(connection, CatIndexReq(indexName))
+                        val json = client.sendRequest(connection, BaseIndex(indexName))
                         val result: Map<String, Any> = mapper.readValue(json)
 
                         val index: Map<String, Any> = mapper.convertValue(result[indexName]!!)

@@ -2,15 +2,8 @@ package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.dinbtechit.es.exception.ElasticsearchHttpException
 import com.github.dinbtechit.es.models.elasticsearch.ESAlias
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
-import com.github.dinbtechit.es.models.elasticsearch.cat.CatIndexReq
-import com.github.dinbtechit.es.services.ElasticsearchHttpClient
-import com.github.dinbtechit.es.configuration.ConnectionInfo
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.diagnostic.thisLogger
 import icons.ElasticsearchIcons
 
 class ElasticsearchAliasNode :

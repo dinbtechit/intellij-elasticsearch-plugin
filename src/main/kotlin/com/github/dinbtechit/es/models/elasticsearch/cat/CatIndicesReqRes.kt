@@ -7,7 +7,7 @@ import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRespon
 import com.github.dinbtechit.es.models.elasticsearch.ESIndex
 
 class CatIndicesRequest(
-    override val path: String = "_cat/indices?format=json&pretty"
+    override val path: String = "_cat/indices?v&s=index:asc&format=json"
 ): AbstractElasticsearchRequest(path = path) {
 }
 
