@@ -71,22 +71,14 @@ fun ElasticSearchConfig.getAllConnectionInfo(): MutableList<ConnectionInfo> {
 
 @Tag("connection-info")
 data class ConnectionInfoState(
-    @Attribute
-    var name: String = "",
-    @Attribute
-    var uuid: String = UUID.randomUUID().toString(),
-    @Tag
-    var url: String = "http://localhost:9200",
-    @Tag
-    var protocol: String = "",
-    @Tag
-    var hostname: String = "localhost",
-    @Tag
-    var port: Int = 9200,
-    @Tag
-    var authenticationType: Int = 0,
-    @Tag
-    var username: String = ""
+    @Attribute var name: String = "",
+    @Attribute var uuid: String = UUID.randomUUID().toString(),
+    @Tag var url: String = "http://localhost:9200",
+    @Tag var protocol: String = "",
+    @Tag var hostname: String = "localhost",
+    @Tag var port: Int = 9200,
+    @Tag var authenticationType: Int = 0,
+    @Tag var username: String = ""
 )
 
 data class ConnectionInfo(

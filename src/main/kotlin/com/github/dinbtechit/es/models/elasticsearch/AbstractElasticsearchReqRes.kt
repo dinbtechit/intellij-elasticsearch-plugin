@@ -9,7 +9,7 @@ abstract class AbstractElasticsearchRequest(
     open val method: String = "GET",
     val header: Map<String, String>? = null,
     val queryParams: Map<String, String>? = null,
-    val body: RequestBody? = null
+    var body: RequestBody? = null
 ) {
 }
 

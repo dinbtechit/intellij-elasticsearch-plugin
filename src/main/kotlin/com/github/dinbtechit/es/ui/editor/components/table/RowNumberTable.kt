@@ -5,16 +5,15 @@ import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.ui.table.JBTable
 import java.awt.Component
+import java.awt.Font
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
-import javax.swing.JScrollPane
-import javax.swing.JTable
-import javax.swing.JViewport
-import javax.swing.UIManager
+import javax.swing.*
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 import javax.swing.event.TableModelListener
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
 
 
@@ -35,14 +34,15 @@ class RowNumberTable(private val main: JBTable) : JTable(), ChangeListener, Prop
         isFocusable = false
         setAutoCreateColumnsFromModel(false)
         setSelectionModel(main.selectionModel)
+        setRowHeight(main.rowHeight)
         val column = TableColumn()
         column.headerValue = " "
         addColumn(column)
         column.cellRenderer = RowNumberRenderer()
-        getColumnModel().getColumn(0).preferredWidth = 25
+        getColumnModel().getColumn(0).preferredWidth = 28
         tableHeader.background = ESTableUI.getResultTableHeaderColor()
         tableHeader.resizingAllowed = true
-        autoResizeMode = AUTO_RESIZE_ALL_COLUMNS
+        tableHeader.reorderingAllowed = false
         gridColor = ESTableUI.getTableGridColor()
         background = ESTableUI.getTableBackground()
         preferredScrollableViewportSize = preferredSize
@@ -55,6 +55,78 @@ class RowNumberTable(private val main: JBTable) : JTable(), ChangeListener, Prop
         //  Keep scrolling of the row table in sync with the main table.
         if (c is JViewport) {
             c.addChangeListener(this)
+        }
+    }
+
+    override fun prepareRenderer(renderer: TableCellRenderer, row: Int, column: Int): Component {
+        return super.prepareRenderer(renderer, row, column).apply {
+            val graduallyGrowColWidth = false
+            preferredSize.width = updateColumnWidth(
+                column, this.preferredSize.width, this@RowNumberTable
+            )
+
+            if (graduallyGrowColWidth) preferredScrollableViewportSize = preferredSize.apply { width += 20 }
+            else getColumnModel().getColumn(0).preferredWidth = preferredSize.width
+        }
+    }
+
+    private fun updateColumnWidth(column: Int, width: Int, table: JTable): Int {
+        val tableColumn = table.columnModel.getColumn(column)
+        val headerWidth: Int = ColumnHeaderRenderer().getTableCellRendererComponent(
+            table,
+            tableColumn.headerValue,
+            false,
+            false,
+            -1,
+            column
+        ).getPreferredSize().width + 4
+        val newWidth = Math.max(width, headerWidth) + 2 * table.intercellSpacing.width
+        tableColumn.preferredWidth =
+            Math.min(Math.max(newWidth, tableColumn.preferredWidth), 250)
+        return newWidth
+    }
+
+    class ColumnHeaderRenderer : DefaultTableHeaderCellRenderer() {
+
+        override fun getTableCellRendererComponent(
+            table: JTable,
+            value: Any,
+            selected: Boolean,
+            focused: Boolean,
+            row: Int,
+            column: Int
+        ): Component {
+            super.getTableCellRendererComponent(table, value, selected, focused, row, column)
+            val selectedColumn = table.selectedColumn
+            if (selectedColumn == column) {
+                setFont(getFont().deriveFont(Font.BOLD))
+            }
+            return this
+        }
+    }
+
+    open class DefaultTableHeaderCellRenderer : DefaultTableCellRenderer() {
+        init {
+            horizontalAlignment = CENTER
+            horizontalTextPosition = LEFT
+            verticalAlignment = BOTTOM
+            isOpaque = false
+        }
+
+        override fun getTableCellRendererComponent(
+            table: JTable, value: Any,
+            isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int
+        ): Component {
+            super.getTableCellRendererComponent(
+                table, value,
+                isSelected, hasFocus, row, column
+            )
+            val tableHeader = table.tableHeader
+            if (tableHeader != null) {
+                foreground = tableHeader.foreground
+            }
+            border = UIManager.getBorder("TableHeader.cellBorder")
+            return this
         }
     }
 
@@ -78,9 +150,6 @@ class RowNumberTable(private val main: JBTable) : JTable(), ChangeListener, Prop
 	 */
     override fun getValueAt(row: Int, column: Int): Any {
         val rowNumber = (row + 1).toString()
-        preferredScrollableViewportSize = preferredSize.apply {
-            width = 25 + (rowNumber.length * 5)
-        }
         return rowNumber
     }
 
@@ -109,12 +178,8 @@ class RowNumberTable(private val main: JBTable) : JTable(), ChangeListener, Prop
     //
     override fun propertyChange(e: PropertyChangeEvent) {
         //  Keep the row table in sync with the main table
-        if ("selectionModel" == e.propertyName) {
-            setSelectionModel(main.selectionModel)
-        }
-        if ("rowHeight" == e.propertyName) {
-            repaint()
-        }
+        if ("selectionModel" == e.propertyName) setSelectionModel(main.selectionModel)
+        if ("rowHeight" == e.propertyName) repaint()
         if ("model" == e.propertyName) {
             main.model.addTableModelListener(this)
             revalidate()

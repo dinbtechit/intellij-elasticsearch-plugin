@@ -6,8 +6,8 @@ import javax.swing.event.TableColumnModelListener
 
 class CapTableColumnInfo(
     val columnName: String,
-    val sortType: CapSortType,
-    val tooltip: String
+    val sortType: CapSortType = CapSortType.STRING,
+    val tooltip: String? = null
 ) {
     val sortField: CapSortField = CapSortField(columnName, null)
 }

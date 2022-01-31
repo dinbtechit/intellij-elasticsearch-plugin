@@ -132,26 +132,27 @@ class ElasticsearchConnectionTreeNode(
     }
 
 
-    private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) = runBlocking {
+    private fun createESNodes(connectionNode: ElasticsearchConnectionTreeNode) {
+         runBlocking {
+            val cluster = connect()
+            println(cluster)
 
-        val cluster = connect()
-        println(cluster)
+            connectionNode.removeAllChildren()
+            // Index
+            val index = ElasticsearchIndexNode()
+            connectionNode.add(index)
+            index.loadDocuments()
 
-        connectionNode.removeAllChildren()
-        // Index
-        val index = ElasticsearchIndexNode()
-        connectionNode.add(index)
-        index.loadDocuments()
+            // Template
+            val template = ElasticsearchTemplateNode()
+            connectionNode.add(template)
+            template.loadDocuments()
 
-        // Template
-        val template = ElasticsearchTemplateNode()
-        connectionNode.add(template)
-        template.loadDocuments()
+            // Pipeline
+            val pipeline = ElasticsearchPipelineNode()
+            connectionNode.add(pipeline)
+            pipeline.loadDocuments()
 
-        // Pipeline
-        val pipeline = ElasticsearchPipelineNode()
-        connectionNode.add(pipeline)
-        pipeline.loadDocuments()
-
+        }
     }
 }

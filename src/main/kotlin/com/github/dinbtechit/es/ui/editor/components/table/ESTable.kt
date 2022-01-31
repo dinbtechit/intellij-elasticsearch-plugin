@@ -59,7 +59,6 @@ class ESTable : JBTable {
                     if (columnInfo?.sortField != null) {
                         sortModel.changeSort(columnInfo.sortField)
                         val tableModel: CapDefaultTableModel = model as CapDefaultTableModel
-                        // 客户端排序
                         var vector = tableModel.dataVector.map {
                             (it as Vector<Any>)
                         }
@@ -116,9 +115,6 @@ class ESTable : JBTable {
         })
 
         gridColor = ESTableUI.getTableGridColor()
-
-        selectionForeground = null
-
         columnModel.addColumnModelListener(object : CapTableColumnModelListener() {
             override fun columnSelectionChanged(e: ListSelectionEvent?) {
                 if (e == null) {
@@ -186,6 +182,7 @@ class ESTable : JBTable {
                 }
             }
             tableColumn.preferredWidth = preferredWidth
+            updateUI()
         }
     }
 }

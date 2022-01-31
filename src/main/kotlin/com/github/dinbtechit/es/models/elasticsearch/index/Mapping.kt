@@ -14,5 +14,4 @@ class MappingReq(
 data class Mapping(
     var name: String?,
     val type: String?,
-    val properties: Mapping?
 )

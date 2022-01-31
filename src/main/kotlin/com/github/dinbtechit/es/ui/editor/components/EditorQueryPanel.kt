@@ -22,7 +22,7 @@ class EditorQueryPanel : JPanel() {
         layout = BorderLayout(0, 0)
         background = if (EditorColorsManager.getInstance().isDarkEditor) Color.decode("#2B2B2B") else super.getBackground()
         editor.apply {
-            setOneLineMode(true)
+            setOneLineMode(false)
             val colorsScheme = EditorColorsManager.getInstance().globalScheme
             val font: Font = colorsScheme.getFont(EditorFontType.PLAIN)
             setFont(font)

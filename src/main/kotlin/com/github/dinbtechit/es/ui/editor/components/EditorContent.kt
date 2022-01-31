@@ -1,31 +1,35 @@
 package com.github.dinbtechit.es.ui.editor.components
 
-import CapDefaultTableModel
 import ESTable
 import ESTableUI
-import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.dinbtechit.es.models.elasticsearch.IndicesCollection
-import com.github.dinbtechit.es.models.elasticsearch.index.MappingReq
-import com.github.dinbtechit.es.models.elasticsearch.index.Search
-import com.github.dinbtechit.es.services.ElasticsearchHttpClient
+import com.github.dinbtechit.es.shared.ProjectUtil
 import com.github.dinbtechit.es.ui.editor.ESVirtualFile
 import com.github.dinbtechit.es.ui.editor.components.table.RowNumberTable
-import com.github.wnameless.json.flattener.FlattenMode
-import com.github.wnameless.json.flattener.JsonFlattener
+import com.github.dinbtechit.es.ui.editor.components.table.action.ColumnFilterActionGroup
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPopupMenu
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.progress.runBackgroundableTask
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.ListPopupStep
+import com.intellij.openapi.ui.popup.PopupChooserBuilder
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.OnePixelSplitter
+import com.intellij.ui.PopupMenuListenerAdapter
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.ui.components.panels.HorizontalLayout
+import com.intellij.ui.popup.ActionPopupStep
+import com.intellij.util.ui.JBDimension
 import com.intellij.util.ui.JBUI
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.awt.BorderLayout
 import java.awt.Color
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JPanel
 import javax.swing.ScrollPaneConstants
+import javax.swing.SwingUtilities
 
 class EditorContent(
     val file: VirtualFile
@@ -35,8 +39,8 @@ class EditorContent(
     private val splitter = OnePixelSplitter(true, 0.01f)
     private val editorQueryPanel = EditorQueryPanel()
     private val editorBodyPanel = JPanel()
-    private val tableModel = EditorTableModel()
-    val table = ESTable(tableModel)
+    var isLoading = AtomicBoolean(true)
+
 
     init {
         layout = BorderLayout(0, 0)
@@ -50,90 +54,60 @@ class EditorContent(
     }
 
     private fun createEditorBody(): JPanel {
+
+        val toolBar = ActionManager.getInstance()
+            .createActionToolbar(
+                "ElasticsearchEditor",
+                DefaultActionGroup().apply {
+                    add(ColumnFilterActionGroup())
+                },
+                true
+            )
+        toolBar.setTargetComponent(this)
+
         return JPanel().apply {
             background = Color.decode("#2B2B2B")
             layout = BorderLayout(0, 0)
-            val scrollPanel = JBScrollPane(
-                table,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
-            ).apply {
-                background = EditorColorsManager.getInstance().schemeForCurrentUITheme.defaultBackground
-                setRowHeaderView(RowNumberTable(table))
-                getCorner(JBScrollPane.UPPER_LEFT_CORNER).apply {
-                    background = ESTableUI.getResultTableHeaderColor()
-                    border = JBUI.Borders.merge(
-                        border,
-                        JBUI.Borders.customLine(Color.BLUE, 1, 0, 1, 1),
-                        true
-                    )
+            runBackgroundableTask("${file.name} Loading...", ProjectUtil.currentProject(), true) {
+                runBlocking {
+                    val vFile = file as ESVirtualFile
+                    val tableModel = vFile.getContentAsTable()
+                    val table = ESTable(tableModel).apply {
+                        rowSelectionAllowed = false
+                        cellSelectionEnabled = true
+                        isFocusable = false
+                    }
 
-                }
-            }
-            // Add Components
-            add(scrollPanel, BorderLayout.CENTER)
-        }
-    }
+                    val scrollPanel = JBScrollPane(
+                        table,
+                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+                    ).apply {
+                        background = EditorColorsManager.getInstance().schemeForCurrentUITheme.defaultBackground
+                        //val rowTable = RowHeaderTable(table)
+                        val rowTable = RowNumberTable(table)
+                        setRowHeaderView(rowTable)
 
-    inner class EditorTableModel : CapDefaultTableModel() {
-        init {
-            CoroutineScope(Dispatchers.Default).launch {
-                if (file is ESVirtualFile) {
-                    val mapper = jacksonObjectMapper()
+                        val panel = JPanel(HorizontalLayout(0, HorizontalLayout.FILL)).apply {
+                            background = ESTableUI.getResultTableHeaderColor()
+                            border = JBUI.Borders.customLine(ESTableUI.getTableGridColor(), 1)
+                            /*val popup = JBPopupFactory.getInstance().createListPopup(ActionPopupStep(
 
-                    val mappingRequest = ElasticsearchHttpClient<MappingReq>()
-                    val mappingResultJson = mappingRequest.sendRequest(file.connection!!, MappingReq(file.name))
-                    val mappings = mutableListOf<String>()
-                    val tempResult: Map<String, Map<String, Any?>> = mapper.readValue(mappingResultJson)
-                    val firstMappings = tempResult[file.name]?.get("mappings")
-                    val properties: Map<String, Any?> = mapper.convertValue(firstMappings!!)
+                            ))*/
+                            val p = this
+                            SwingUtilities.invokeLater {
+                                add(toolBar.component.apply {
+                                    size = JBDimension(p.size.width, p.size.height)
+                                }, HorizontalLayout.CENTER)
 
-                    fun mappingsToObj(properties: Map<String, Any?>, parent: String? = null) {
-                        for ((k, v) in properties) {
-                            if (v is Map<*, *> && v.containsKey("properties") && v["properties"] is Map<*, *>) {
-                                mappingsToObj(mapper.convertValue(v["properties"] as Map<String, Any?>),
-                                    if (parent.isNullOrBlank()) k else "$parent.$k")
-                            } else {
-                                if (parent.isNullOrBlank()) mappings.add(k) else mappings.add("$parent.$k")
                             }
                         }
+                        setCorner(JBScrollPane.UPPER_LEFT_CORNER, panel)
                     }
-                    if (properties["properties"] is Map<*, *>) {
-                        mappingsToObj(properties["properties"] as Map<String, Any?>)
-                    }
-
-
-                    val searchRequest = ElasticsearchHttpClient<Search>()
-                    val searchResultJson = searchRequest.sendRequest(file.connection, Search(file.name))
-                    val index: IndicesCollection = mapper.readValue(searchResultJson)
-
-                    mappings.sort()
-
-                    addColumn("_id")
-                    for (col in mappings) {
-                        addColumn(col)
-                    }
-
-                    for (eachHit in index.hits.hits) {
-                        val row = arrayListOf<Any?>(eachHit.id)
-                        for (col in mappings) {
-                            row.add(eachHit.getFlattenedSource()[col])
-                        }
-                        addRow(row.toArray())
-                    }
-
-                    table.adjustColumnsBySize()
-                    table.repaint()
-                    table.revalidate()
+                    // Add Components
+                    add(scrollPanel, BorderLayout.CENTER)
                 }
             }
         }
-
-        fun IndicesCollection.Hits.Hits.getFlattenedSource(): Map<String, Any?> {
-            val json = jacksonObjectMapper().writeValueAsString(source)
-            return JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS).flattenAsMap()
-        }
-
     }
-
 }
