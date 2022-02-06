@@ -9,7 +9,7 @@ import com.intellij.openapi.project.DumbAware
 
 class DuplicateAction : AnAction(
     "Elasticsearch: Duplicate", "Duplicate elasticsearch connection", AllIcons.Actions.Copy
-), DumbAware {
+) {
 
     companion object {
         const val ID = "com.github.dinbtechit.es.actions.DuplicateAction"

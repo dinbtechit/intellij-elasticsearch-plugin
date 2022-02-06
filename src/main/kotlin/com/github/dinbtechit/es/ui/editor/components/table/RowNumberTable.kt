@@ -60,7 +60,7 @@ class RowNumberTable(private val main: JBTable) : JTable(), ChangeListener, Prop
 
     override fun prepareRenderer(renderer: TableCellRenderer, row: Int, column: Int): Component {
         return super.prepareRenderer(renderer, row, column).apply {
-            val graduallyGrowColWidth = false
+            val graduallyGrowColWidth = false // In the future this can be made as Table Policy
             preferredSize.width = updateColumnWidth(
                 column, this.preferredSize.width, this@RowNumberTable
             )
@@ -79,7 +79,7 @@ class RowNumberTable(private val main: JBTable) : JTable(), ChangeListener, Prop
             false,
             -1,
             column
-        ).getPreferredSize().width + 4
+        ).preferredSize.width + 4
         val newWidth = Math.max(width, headerWidth) + 2 * table.intercellSpacing.width
         tableColumn.preferredWidth =
             Math.min(Math.max(newWidth, tableColumn.preferredWidth), 250)

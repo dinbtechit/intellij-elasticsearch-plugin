@@ -48,21 +48,20 @@ class ElasticsearchIndexNode : ElasticsearchTreeNode<ElasticsearchDocument.Types
     }
 
     private fun loadAliases() {
-        val obj = this
         for (node in children()) {
             if (node is ElasticsearchTreeNode<*, *>) {
                 CoroutineScope(Dispatchers.Default).launch {
                     try {
                         val client = ElasticsearchHttpClient<BaseIndex>()
-                        val connection = if (obj.parent is ElasticsearchConnectionTreeNode)
-                            (obj.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
+                        val connection = if (this@ElasticsearchIndexNode.parent is ElasticsearchConnectionTreeNode)
+                            (this@ElasticsearchIndexNode.parent as ElasticsearchConnectionTreeNode).data else ConnectionInfo()
                         val indexName = (node.data as ESIndex).displayName
                         val json = client.sendRequest(connection, BaseIndex(indexName))
                         val result: Map<String, Any> = mapper.readValue(json)
 
                         val index: Map<String, Any> = mapper.convertValue(result[indexName]!!)
                         val aliases: Map<String, Any> = mapper.convertValue(index["aliases"]!!)
-                        val aliasNode = ElasticsearchAliasNode()
+                        val aliasNode = ElasticsearchIndexAliasNode()
                         aliasNode.loadDocuments(aliases)
                         node.add(aliasNode)
                     } catch (e: ElasticsearchHttpException) {

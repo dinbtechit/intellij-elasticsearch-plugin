@@ -23,8 +23,9 @@ object ElasticsearchIcons {
     object General {
         val DataTable_16px = IconLoader.getIcon("/icons/datatable-16px.svg", javaClass)
         val DataTable_ReadOnly_16px = IconLoader.getIcon("/icons/dataTable-readonly-16px.svg", javaClass)
+        val DataTable_Shortcut = IconLoader.getIcon("/icons/dataTable-shortcut-16px.svg", javaClass)
+        val DataTable_Write = IconLoader.getIcon("/icons/dataTable-write-16px.svg", javaClass)
         val UpArrow = IconLoader.getIcon("/icons/arrow_up_thick.svg", javaClass)
-
     }
 
     object Action {

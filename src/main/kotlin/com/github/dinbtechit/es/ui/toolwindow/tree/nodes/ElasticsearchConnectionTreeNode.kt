@@ -138,7 +138,13 @@ class ElasticsearchConnectionTreeNode(
             println(cluster)
 
             connectionNode.removeAllChildren()
-            // Index
+
+             // Aliases
+             val aliases = ElasticsearchAliasNode()
+             connectionNode.add(aliases)
+             aliases.loadDocuments()
+
+            // Indices
             val index = ElasticsearchIndexNode()
             connectionNode.add(index)
             index.loadDocuments()

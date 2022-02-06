@@ -1,16 +1,22 @@
 
 
+import com.github.dinbtechit.es.shared.ProjectUtil
+import com.github.dinbtechit.es.ui.editor.components.table.ExpTableCellRenderer
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorFontType
+import com.intellij.openapi.util.Disposer
 import com.intellij.ui.JBColor
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
 import java.awt.Component
+import java.awt.Font
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.util.*
+import javax.swing.SwingUtilities
 import javax.swing.event.ListSelectionEvent
 import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
@@ -19,9 +25,10 @@ import javax.swing.table.TableModel
 import kotlin.math.max
 import kotlin.math.min
 
-class ESTable : JBTable {
+class ESTable : JBTable, Disposable {
     val sortModel: CapSortModel = CapSortModel()
     val headerMouseListeners: MutableList<((sortModel: CapSortModel) -> Unit)> = mutableListOf()
+    val project = ProjectUtil.currentProject()
 
     constructor() : super() {
         initComponent()
@@ -36,7 +43,7 @@ class ESTable : JBTable {
     }
 
     private fun initComponent() {
-        val colorsScheme = EditorColorsManager.getInstance().globalScheme
+        val colorsScheme = EditorColorsManager.getInstance().schemeForCurrentUITheme
         font = colorsScheme.getFont(EditorFontType.PLAIN)
         autoResizeMode = JBTable.AUTO_RESIZE_OFF
         cellSelectionEnabled = true
@@ -50,7 +57,7 @@ class ESTable : JBTable {
         tableHeader.border = JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0)
         tableHeader.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                if (rowAtPoint(e.point) == 0 || rowCount == 0) {
+                if (SwingUtilities.isLeftMouseButton(e) && rowAtPoint(e.point) == 0 || rowCount == 0) {
                     val columnViewIndex: Int = columnAtPoint(e.point)
                     if (columnViewIndex == -1) return
                     val columnModelIndex: Int = convertColumnIndexToModel(columnViewIndex)
@@ -131,9 +138,14 @@ class ESTable : JBTable {
             }
         })
 
+        for (l in this.mouseMotionListeners) {
+            removeMouseMotionListener(l)
+        }
+
         adjustColumnsBySize()
         isOpaque = true
         fillsViewportHeight = true
+
     }
 
     fun registerHeaderMouseListener(listener: (sortModel: CapSortModel) -> Unit) {
@@ -184,6 +196,10 @@ class ESTable : JBTable {
             tableColumn.preferredWidth = preferredWidth
             updateUI()
         }
+    }
+
+    override fun dispose() {
+        Disposer.dispose(this)
     }
 }
 

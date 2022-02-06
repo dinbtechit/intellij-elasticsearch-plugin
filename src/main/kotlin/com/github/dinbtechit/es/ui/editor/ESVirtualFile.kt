@@ -15,13 +15,14 @@ import com.github.wnameless.json.flattener.JsonFlattener
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileSystem
-import kotlinx.coroutines.*
+import com.jetbrains.rd.util.first
 import kotlinx.coroutines.flow.*
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.Runnable
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.collections.HashMap
 
 open class ESVirtualFile(
     private val fileName: String = "Default", val connection: ConnectionInfo?
@@ -57,10 +58,13 @@ open class ESVirtualFile(
         val mappingRequest = ElasticsearchHttpClient<MappingReq>()
         val mappingResultJson = mappingRequest.sendRequest(connection!!, MappingReq(name))
         val tempResult: Map<String, Map<String, Any?>> = mapper.readValue(mappingResultJson)
-        return mapper.convertValue(tempResult[name]?.get("mappings")!!)
+        return mapper.convertValue(tempResult.first().value["mappings"]!!)
     }
 
-    private suspend fun getFlattenedFieldNames(skipFields: String = "", sorted: Boolean = true): List<Mapping> {
+    private suspend fun getFlattenedFieldNames(
+        hits: List<IndicesCollection.Hits.Hits>,
+        sorted: Boolean = true
+    ): List<Mapping> {
         val fields = mutableListOf<Mapping>()
         fun mappingsToObj(properties: Map<String, Any?>, parent: String? = null) {
             for ((k, v) in properties) {
@@ -68,6 +72,7 @@ open class ESVirtualFile(
                     && v.containsKey("properties")
                     && v["properties"] is Map<*, *>
                     && v["type"] != "object"
+                    && isParentAnArray(hits, k).not()
                 ) {
                     mappingsToObj(
                         mapper.convertValue(v["properties"] as Map<String, Any?>),
@@ -75,12 +80,11 @@ open class ESVirtualFile(
                     )
                 } else {
                     val type = if (v is Map<*, *> && v["type"] != null) v["type"] as String else null
-                    if (parent.isNullOrBlank()) fields.add(Mapping(k, type)) else fields.add(
-                        Mapping(
-                            "$parent.$k",
-                            type
-                        )
-                    )
+                    if (parent.isNullOrBlank()) {
+                        fields.add(Mapping(k, type))
+                    } else {
+                        fields.add(Mapping("$parent.$k", type))
+                    }
                 }
             }
         }
@@ -97,7 +101,7 @@ open class ESVirtualFile(
         return mapper.readValue(searchResultJson)
     }
 
-    fun IndicesCollection.Hits.Hits.getFlattenedSource(): Map<String, Any?> {
+    private fun IndicesCollection.Hits.Hits.getFlattenedSource(): Map<String, Any?> {
         val json = jacksonObjectMapper().writeValueAsString(source)
         return JsonFlattener(json).withFlattenMode(FlattenMode.KEEP_PRIMITIVE_ARRAYS).flattenAsMap()
     }
@@ -106,10 +110,11 @@ open class ESVirtualFile(
         val columns = Vector<Any>()
         val rows = Vector<Vector<Any?>>()
         println("getContentAsTable... Start")
+        val hits = searchIndex().hits.hits
         columns.add("_id")
-        val columnNames = getFlattenedFieldNames()
+        val columnNames = getFlattenedFieldNames(hits)
         columns.addAll(columnNames.stream().map { it.name }.collect(Collectors.toList()))
-        for (eachHit in searchIndex().hits.hits) {
+        for (eachHit in hits) {
             getRow(eachHit, columnNames).collect {
                 rows.add(it)
             }
@@ -118,16 +123,19 @@ open class ESVirtualFile(
         return CapDefaultTableModel(rows, columns)
     }
 
-    fun getRow(
+    private fun getRow(
         eachHit: IndicesCollection.Hits.Hits,
         columnNames: List<Mapping>,
     ): Flow<Vector<Any?>> {
         return flow {
             val cell = Vector<Any?>()
             cell.add(eachHit.id)
+            val flattenSource = eachHit.getFlattenedSource()
             for (col in columnNames) {
                 cell.add(
-                    if (col.type != "object") eachHit.getFlattenedSource()[col.name]
+                    if (col.type != "object") {
+                        if (flattenSource[col.name] == null) eachHit.source[col.name] else flattenSource[col.name]
+                    }
                     else eachHit.source[col.name]
                 )
             }
@@ -135,4 +143,11 @@ open class ESVirtualFile(
         }
     }
 
+    private fun isParentAnArray(hits: List<IndicesCollection.Hits.Hits>, colName: String?): Boolean {
+        if (hits.isEmpty().not()) {
+            val rootDocument = hits.stream().map{ it.source[colName]}.filter { it != null }.findFirst().orElse(null)
+            if (rootDocument != null && rootDocument is List<*>) return true
+        }
+        return false
+    }
 }

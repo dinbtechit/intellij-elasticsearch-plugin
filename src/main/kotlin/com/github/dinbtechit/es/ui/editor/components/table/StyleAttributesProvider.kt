@@ -13,7 +13,7 @@ object StyleAttributesProvider {
     fun getKeywordAttributes() = getSimpleTextAttributes(DefaultLanguageHighlighterColors.KEYWORD)
     fun getKeywordValueAttributes() = getSimpleTextAttributes(DefaultLanguageHighlighterColors.KEYWORD)
     fun getStringAttributes() = getSimpleTextAttributes(DefaultLanguageHighlighterColors.STRING)
-    fun getIdentifierAttributes() = getSimpleTextAttributes(DefaultLanguageHighlighterColors.IDENTIFIER)
+    fun getIdentifierAttributes() = getSimpleTextAttributes(DefaultLanguageHighlighterColors.LABEL)
     fun getBracesAttributes() = getSimpleTextAttributes(DefaultLanguageHighlighterColors.BRACES)
 
     private fun getSimpleTextAttributes(

@@ -3,6 +3,7 @@ package com.github.dinbtechit.es.models.elasticsearch.index
 import com.github.dinbtechit.es.models.elasticsearch.AbstractElasticsearchRequest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.intellij.lang.annotations.Language
 
 class Search(
     name: String
@@ -12,6 +13,7 @@ class Search(
 ) {
     init {
         val mediaType = "application/json; charset=iso-8859-1".toMediaType()
+        @Language("JSON")
         val jsonStr = """
             {
                 "size" : 60

@@ -17,7 +17,7 @@ import javax.swing.KeyStroke
 
 class RefreshAction : AnAction(
     "Refresh", "Refresh Elasticsearch connection", AllIcons.Actions.Refresh
-), DumbAware {
+) {
     var isEnabled = false
     val controller = ProjectUtil.currentProject().service<TreeModelController>()
 

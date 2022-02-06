@@ -72,42 +72,42 @@ class EditorContent(
                 runBlocking {
                     val vFile = file as ESVirtualFile
                     val tableModel = vFile.getContentAsTable()
-                    val table = ESTable(tableModel).apply {
-                        rowSelectionAllowed = false
-                        cellSelectionEnabled = true
-                        isFocusable = false
-                    }
+                    SwingUtilities.invokeLater {
+                        val table = ESTable(tableModel).apply {
+                            rowSelectionAllowed = false
+                            cellSelectionEnabled = true
+                            isFocusable = false
+                        }
+                        val scrollPanel = JBScrollPane(
+                            table,
+                            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
+                        ).apply {
+                            background = EditorColorsManager.getInstance().schemeForCurrentUITheme.defaultBackground
+                            //val rowTable = RowHeaderTable(table)
+                            val rowTable = RowNumberTable(table)
+                            setRowHeaderView(rowTable)
 
-                    val scrollPanel = JBScrollPane(
-                        table,
-                        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
-                    ).apply {
-                        background = EditorColorsManager.getInstance().schemeForCurrentUITheme.defaultBackground
-                        //val rowTable = RowHeaderTable(table)
-                        val rowTable = RowNumberTable(table)
-                        setRowHeaderView(rowTable)
+                            val panel = JPanel(HorizontalLayout(0, HorizontalLayout.FILL)).apply {
+                                background = ESTableUI.getResultTableHeaderColor()
+                                border = JBUI.Borders.customLine(ESTableUI.getTableGridColor(), 1)
+                                /*val popup = JBPopupFactory.getInstance().createListPopup(ActionPopupStep(
 
-                        val panel = JPanel(HorizontalLayout(0, HorizontalLayout.FILL)).apply {
-                            background = ESTableUI.getResultTableHeaderColor()
-                            border = JBUI.Borders.customLine(ESTableUI.getTableGridColor(), 1)
-                            /*val popup = JBPopupFactory.getInstance().createListPopup(ActionPopupStep(
-
-                            ))*/
-                            val p = this
-                            SwingUtilities.invokeLater {
+                                ))*/
+                                val p = this
                                 add(toolBar.component.apply {
                                     size = JBDimension(p.size.width, p.size.height)
                                 }, HorizontalLayout.CENTER)
 
                             }
+                            setCorner(JBScrollPane.UPPER_LEFT_CORNER, panel)
                         }
-                        setCorner(JBScrollPane.UPPER_LEFT_CORNER, panel)
+                        // Add Components
+                        add(scrollPanel, BorderLayout.CENTER)
                     }
-                    // Add Components
-                    add(scrollPanel, BorderLayout.CENTER)
                 }
             }
+
         }
     }
 }

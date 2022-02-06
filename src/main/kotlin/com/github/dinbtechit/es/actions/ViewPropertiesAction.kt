@@ -15,7 +15,7 @@ import com.intellij.openapi.project.DumbAware
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class ViewPropertiesAction : AnAction(), DumbAware {
+class ViewPropertiesAction : AnAction() {
     companion object {
         const val ID = "com.github.dinbtechit.es.actions.ViewPropertiesAction"
     }

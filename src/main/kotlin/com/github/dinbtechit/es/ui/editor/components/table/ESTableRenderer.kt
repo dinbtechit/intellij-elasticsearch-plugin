@@ -1,20 +1,26 @@
-
 import com.github.dinbtechit.es.ui.editor.components.table.StyleAttributesProvider
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.ui.ColoredTableCellRenderer
 import com.intellij.ui.SimpleTextAttributes
-import java.awt.Component
-import javax.swing.JProgressBar
-import javax.swing.JTable
-import javax.swing.SwingConstants
+import java.awt.*
+import java.text.DecimalFormat
+import javax.swing.*
 import javax.swing.border.EmptyBorder
+import javax.swing.table.TableCellEditor
 import javax.swing.table.TableCellRenderer
+
 
 class CapTableColoredCellRenderer : ColoredTableCellRenderer {
 
+
+    var df: DecimalFormat? = null
+    var text: String? = null
+    
+
     constructor() : super() {
-        val colorsScheme = EditorColorsManager.getInstance().globalScheme
+        val colorsScheme = EditorColorsManager.getInstance().schemeForCurrentUITheme
+        //font = JBUI.Fonts.label().deriveFont(Font.PLAIN)
         font = colorsScheme.getFont(EditorFontType.PLAIN)
     }
 
@@ -87,7 +93,11 @@ class CapTableColoredCellRenderer : ColoredTableCellRenderer {
     companion object {
         val instance = CapTableColoredCellRenderer()
         private val EMPTY_BORDER = EmptyBorder(1, 1, 1, 1)
+        private val SIZE = 32
+        private val HALF = SIZE / 2
     }
+
+
 }
 
 class CapTableProgressBarCellRenderer(private val min: Int, private val max: Int) : TableCellRenderer {
