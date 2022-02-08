@@ -1,7 +1,6 @@
 
 
 import com.github.dinbtechit.es.shared.ProjectUtil
-import com.github.dinbtechit.es.ui.editor.components.table.ExpTableCellRenderer
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.colors.EditorFontType

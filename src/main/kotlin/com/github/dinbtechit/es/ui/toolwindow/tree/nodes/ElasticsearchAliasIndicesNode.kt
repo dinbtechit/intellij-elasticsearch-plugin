@@ -1,9 +1,6 @@
 package com.github.dinbtechit.es.ui.toolwindow.tree.nodes
 
-import com.fasterxml.jackson.module.kotlin.convertValue
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.dinbtechit.es.models.elasticsearch.ESAlias
-import com.github.dinbtechit.es.models.elasticsearch.ESIndexAlias
 import com.github.dinbtechit.es.models.elasticsearch.ElasticsearchDocument
 import icons.ElasticsearchIcons
 

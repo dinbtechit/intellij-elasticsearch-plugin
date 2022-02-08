@@ -18,7 +18,7 @@ class ElasticsearchAliasNode :
     ElasticsearchTreeNode<ElasticsearchDocument.Types, ESAlias>(
         ElasticsearchIcons.esAliases,
         data = ElasticsearchDocument.Types.ALIAS,
-        childIcon = ElasticsearchIcons.General.DataTable_Shortcut
+        childIcon = ElasticsearchIcons.General.DataTable_Shortcut_Readonly
     ) {
 
 
@@ -42,8 +42,9 @@ class ElasticsearchAliasNode :
             if (node is ElasticsearchTreeNode<*, *>) {
                 val indexNode = ElasticsearchAliasIndicesNode()
                 val data = node.data
-                if (data is ESAlias)
-                indexNode.loadDocuments(groupByAliasName[data.displayName]!!)
+                if (data is ESAlias) {
+                    indexNode.loadDocuments(groupByAliasName[data.displayName]!!)
+                }
                 node.add(indexNode)
             }
         }

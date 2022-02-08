@@ -41,7 +41,7 @@ data class ESIndexAlias(
     @JsonProperty("routing.index") val routingIndex: String = "",
     @JsonProperty("routing.search") val routingSearch: String = "",
     @JsonDeserialize(using = WriteIndexBooleanSerializer::class)
-    @JsonProperty("is_write_index") val isWriteIndex: Boolean = false
+    @JsonProperty("is_write_index") val isWriteIndex: Boolean = true
 ) : ElasticsearchDocument(displayName) {}
 
 private class WriteIndexBooleanSerializer : JsonDeserializer<Boolean>() {
