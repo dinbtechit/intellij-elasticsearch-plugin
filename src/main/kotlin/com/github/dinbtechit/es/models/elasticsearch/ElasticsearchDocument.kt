@@ -84,8 +84,7 @@ data class ESIndex(
 data class ESTemplate(
     @JsonProperty("name") override var displayName: String,
     @JsonProperty("index_patterns") val indexPatterns: String
-) :
-    ElasticsearchDocument(displayName)
+) : ElasticsearchDocument(displayName)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ESIngestPipeline(

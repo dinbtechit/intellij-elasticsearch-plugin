@@ -18,6 +18,7 @@ object ElasticsearchIcons {
     val esAliases = IconLoader.getIcon("/icons/es-alias-16px.svg", javaClass)
     val esPipelines = IconLoader.getIcon("/icons/es-pipeline-16px.svg", javaClass)
     val esTemplates = IconLoader.getIcon("/icons/es-template-16px.svg", javaClass)
+    val pipeline = IconLoader.getIcon("/icons/pipeline-16px.svg", javaClass)
 
     //General
     object General {

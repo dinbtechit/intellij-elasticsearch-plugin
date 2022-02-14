@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 class ElasticsearchPipelineNode : ElasticsearchTreeNode<ElasticsearchDocument.Types, ESIngestPipeline>(
     ElasticsearchIcons.esPipelines,
     data = ElasticsearchDocument.Types.INGEST_PIPELINES,
-    AllIcons.RunConfigurations.Web_app
+    ElasticsearchIcons.pipeline
 ) {
 
     init {
