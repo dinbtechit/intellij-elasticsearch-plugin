@@ -1,33 +1,31 @@
-
-
 import com.github.dinbtechit.es.shared.ProjectUtil
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.util.Disposer
+import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
 import com.intellij.util.ui.JBUI
-import java.awt.Component
-import java.awt.Font
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.*
+import java.awt.event.*
 import java.util.*
+import javax.swing.DefaultCellEditor
 import javax.swing.SwingUtilities
-import javax.swing.event.ListSelectionEvent
-import javax.swing.table.TableCellRenderer
-import javax.swing.table.TableColumn
-import javax.swing.table.TableColumnModel
-import javax.swing.table.TableModel
+import javax.swing.event.*
+import javax.swing.table.*
 import kotlin.math.max
 import kotlin.math.min
 
+
 class ESTable : JBTable, Disposable {
+
     val sortModel: CapSortModel = CapSortModel()
     val headerMouseListeners: MutableList<((sortModel: CapSortModel) -> Unit)> = mutableListOf()
     val project = ProjectUtil.currentProject()
+
+    private val columnCellEditorTextField = JBTextField()
+    private val columnCellEditor = DefaultCellEditor(columnCellEditorTextField)
 
     constructor() : super() {
         initComponent()
@@ -43,10 +41,11 @@ class ESTable : JBTable, Disposable {
 
     private fun initComponent() {
         val colorsScheme = EditorColorsManager.getInstance().schemeForCurrentUITheme
-        font = colorsScheme.getFont(EditorFontType.PLAIN)
+        //font = colorsScheme.getFont(EditorFontType.PLAIN)
         autoResizeMode = JBTable.AUTO_RESIZE_OFF
         cellSelectionEnabled = true
-        setDefaultRenderer(Any::class.java, CapTableColoredCellRenderer.instance)
+        //setDefaultRenderer(Any::class.java, ESTableCellHtmlRenderer())
+        setDefaultRenderer(Any::class.java, CapTableColoredCellRenderer())
         tableHeader.defaultRenderer = CapTableColumnHeaderCellRenderer()
         tableHeader.font = font
         background = EditorColorsManager.getInstance().schemeForCurrentUITheme.defaultBackground
@@ -76,30 +75,35 @@ class ESTable : JBTable, Disposable {
                                             it[columnModelIndex].toString().toDouble()
                                         }
                                     }
+
                                     CapSortOrder.DESC -> when (columnModelIndex) {
                                         else -> vector.sortedByDescending {
                                             it[columnModelIndex].toString().toDouble()
                                         }
                                     }
                                 }
+
                                 CapSortType.LONG -> when (field.order) {
                                     CapSortOrder.ASC -> when (columnModelIndex) {
                                         else -> vector.sortedBy {
                                             it[columnModelIndex].toString().toLong()
                                         }
                                     }
+
                                     CapSortOrder.DESC -> when (columnModelIndex) {
                                         else -> vector.sortedByDescending {
                                             it[columnModelIndex].toString().toLong()
                                         }
                                     }
                                 }
+
                                 else -> when (field.order) {
                                     CapSortOrder.ASC -> when (columnModelIndex) {
                                         else -> vector.sortedBy {
                                             it[columnModelIndex].toString()
                                         }
                                     }
+
                                     CapSortOrder.DESC -> when (columnModelIndex) {
                                         else -> vector.sortedByDescending {
                                             it[columnModelIndex].toString()
@@ -141,6 +145,23 @@ class ESTable : JBTable, Disposable {
             removeMouseMotionListener(l)
         }
 
+        columnCellEditorTextField.document.addDocumentListener(object : DocumentAdapter() {
+            override fun textChanged(e: DocumentEvent) {
+                println("Doc Changed - $e")
+            }
+        })
+
+        columnCellEditor.addCellEditorListener(object : CellEditorListener {
+            override fun editingStopped(e: ChangeEvent?) {
+                println("stopped editing $e")
+            }
+
+            override fun editingCanceled(e: ChangeEvent?) {
+                println("cancelled editing $e")
+            }
+
+        })
+
         adjustColumnsBySize()
         isOpaque = true
         fillsViewportHeight = true
@@ -167,8 +188,21 @@ class ESTable : JBTable, Disposable {
         return convertRowIndexToModel(row)
     }
 
+    override fun setValueAt(newValue: Any?, row: Int, column: Int) {
+        // Validate the cell value before updating.
+        if (selectedColumn == column && selectedRow == row) {
+            val previousValue = getValueAt(row, column)
+            if (previousValue == null && newValue == "") {
+                super.setValueAt(previousValue, row, column)
+                return
+            }
+        }
+        super.setValueAt(newValue, row, column)
+    }
+
     fun adjustColumnsBySize() {
         for (column in 0 until columnCount) {
+            columnModel.getColumn(column).cellEditor = columnCellEditor
             val tableColumn: TableColumn = getColumnModel().getColumn(column)
             val renderer = tableHeader.defaultRenderer as CapTableColumnHeaderCellRenderer
             val header: Component =
@@ -197,9 +231,8 @@ class ESTable : JBTable, Disposable {
         }
     }
 
+
     override fun dispose() {
         Disposer.dispose(this)
     }
 }
-
-

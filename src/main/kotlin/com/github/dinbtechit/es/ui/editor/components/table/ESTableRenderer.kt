@@ -1,28 +1,15 @@
 import com.github.dinbtechit.es.ui.editor.components.table.StyleAttributesProvider
-import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.colors.EditorFontType
+import com.intellij.openapi.editor.impl.FontFallbackIterator
 import com.intellij.ui.ColoredTableCellRenderer
 import com.intellij.ui.SimpleTextAttributes
+import com.intellij.ui.components.JBLabel
 import java.awt.*
-import java.text.DecimalFormat
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import javax.swing.table.TableCellEditor
-import javax.swing.table.TableCellRenderer
+import javax.swing.table.DefaultTableCellRenderer
 
 
-class CapTableColoredCellRenderer : ColoredTableCellRenderer {
-
-
-    var df: DecimalFormat? = null
-    var text: String? = null
-    
-
-    constructor() : super() {
-        val colorsScheme = EditorColorsManager.getInstance().schemeForCurrentUITheme
-        //font = JBUI.Fonts.label().deriveFont(Font.PLAIN)
-        font = colorsScheme.getFont(EditorFontType.PLAIN)
-    }
+class CapTableColoredCellRenderer() : ColoredTableCellRenderer() {
 
     override fun customizeCellRenderer(
         table: JTable,
@@ -100,7 +87,9 @@ class CapTableColoredCellRenderer : ColoredTableCellRenderer {
 
 }
 
-class CapTableProgressBarCellRenderer(private val min: Int, private val max: Int) : TableCellRenderer {
+
+internal class ESTableCellHtmlRenderer() : DefaultTableCellRenderer() {
+
     override fun getTableCellRendererComponent(
         table: JTable?,
         value: Any?,
@@ -109,18 +98,17 @@ class CapTableProgressBarCellRenderer(private val min: Int, private val max: Int
         row: Int,
         column: Int
     ): Component {
-        val progressBar = JProgressBar(min, max)
-        val stringValue = value.toString()
-        progressBar.value = stringValue.split(" ").toMutableList().last().replace("%", "").toInt()
-        progressBar.string = value.toString()
-        progressBar.isStringPainted = true
-        return progressBar
-//        return panel {
-//            row("$value") {
-//            }
-//            row {
-//                component(progressBar)
-//            }
-//        }
+        val comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+        try {
+            val valStr = if (value?.toString() is String) value.toString() else ""
+            val fontPre = FontFallbackIterator().apply {
+                start(valStr, 0, valStr.length)
+            }
+            text = "<html><span style='font-family: ${fontPre.font.family}'>${value}</span></html>"
+        } catch (e: Exception) {
+            text = ""
+        }
+        verticalAlignment = JBLabel.LEADING
+        return comp
     }
 }
