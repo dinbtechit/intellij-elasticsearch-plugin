@@ -3,6 +3,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.EditorNotificationPanel.ActionHandler
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.table.JBTable
@@ -145,11 +146,12 @@ class ESTable : JBTable, Disposable {
             removeMouseMotionListener(l)
         }
 
-        columnCellEditorTextField.document.addDocumentListener(object : DocumentAdapter() {
-            override fun textChanged(e: DocumentEvent) {
-                println("Doc Changed - $e")
+        columnCellEditorTextField.addActionListener (object: ActionListener {
+            override fun actionPerformed(e: ActionEvent?) {
+                println("Action Performed: $e")
             }
-        })
+
+        } )
 
         columnCellEditor.addCellEditorListener(object : CellEditorListener {
             override fun editingStopped(e: ChangeEvent?) {
